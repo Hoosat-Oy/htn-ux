@@ -21,7 +21,7 @@ class KaspaFaucetDialog extends KaspaDialog{
         return html`
             ${ this.status ? html`<div>${this.status}</div>` : html`
                 <div is="i18n">Available:</div>
-                <div>${KAS(available)} KAS</div>
+                <div>${KAS(available)} HTN</div>
 
                 ${this.period ? html`
                     <div><span is="i18n">Additional funds will be<br/>available in</span> ${FlowFormat.duration(this.period)}</div>

@@ -201,11 +201,11 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
   			<div class="balance-badge">
                 <div class="balance">
                     <span class="label" is="i18n-span">Available</span>
-                    <span class="value">${this.formatKAS(available)} KAS</span>
+                    <span class="value">${this.formatKAS(available)} HTN</span>
                 </div>
                 <div class="balance pending">
                     <span class="label-pending" is="i18n-span">Pending</span>
-                    <span class="value-pending">${this.formatKAS(pending)} KAS</span>
+                    <span class="value-pending">${this.formatKAS(pending)} HTN</span>
                 </div>
             </div>
 		`;

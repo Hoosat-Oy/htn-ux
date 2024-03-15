@@ -274,7 +274,7 @@ export class KaspaWalletUI extends BaseElement{
 					return html`<div class="tx-notification">
 						${n.compoundUTXOs?
 							T(`Compounding UTXOs...`):
-							i18n.t(`Preparing transaction for [n] KAS ....`)
+							i18n.t(`Preparing transaction for [n] HTN ....`)
 							.replace('[n]', this.formatKAS(n.amount))}
 					</div>`
 				})}
@@ -299,7 +299,7 @@ export class KaspaWalletUI extends BaseElement{
 						<div class="tx-title" slot="title">
 							<div class="tx-date flex">${tx.date}</div>
 							<div class="amount">
-								${tx.in?'':'-'}${this.formatKAS(tx.amount)} KAS
+								${tx.in?'':'-'}${this.formatKAS(tx.amount)} HTN
 							</div>
 						</div>
 						${ 0<=cfm&cfm<=COUNT? html`<flow-progressbar class="tx-progressbar" 
@@ -309,11 +309,11 @@ export class KaspaWalletUI extends BaseElement{
 						<div class="tx-body">
 							${tx.note}
 							<div class="tx-id">
-								<a target="_blank" href="https://explorer.kaspa.org/txs/${tx.id}">${tx.id}</a>
+								<a target="_blank" href="https://explorer.hoosat.fi/txs/${tx.id}">${tx.id}</a>
 							</div>
 							<div class="tx-address">
 								${tx.myAddress?T('COMPOUNDING WALLET => '):''}
-								<a target="_blank" href="https://explorer.kaspa.org/addresses/${tx.address}">${tx.address}</a>
+								<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 							</div>
 						</div>
 					</flow-expandable>
@@ -352,14 +352,14 @@ export class KaspaWalletUI extends BaseElement{
 							`:''
 						}
 						<div class="tx-date" title="#${skip+i+1} Transaction">${tx.date}</div>
-						<div class="tx-amount">${tx.in?'':'-'}${KAS(tx.amount)} KAS</div>
+						<div class="tx-amount">${tx.in?'':'-'}${KAS(tx.amount)} HTN</div>
 						<div class="br tx-note">${tx.note}</div>
 						<div class="br tx-id">
-							<a target="_blank" href="https://explorer.kaspa.org/txs/${tx.id.split(":")[0]}">${tx.id.split(":")[0]}</a>
+							<a target="_blank" href="https://explorer.hoosat.fi/txs/${tx.id.split(":")[0]}">${tx.id.split(":")[0]}</a>
 						</div>
 						<div class="tx-address">
 							${tx.myAddress?T('COMPOUNDING WALLET => '):''}
-							<a target="_blank" href="https://explorer.kaspa.org/addresses/${tx.address}">${tx.address}</a>
+							<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 						</div>
 					</div>`
 				})}
@@ -519,13 +519,13 @@ export class KaspaWalletUI extends BaseElement{
 						<div class="tx-date" title="#${skip+i+1} UTXO">
 							${tx.blockDaaScore} (${tx.mass})
 						</div>
-						<div class="tx-amount">${KAS(tx.satoshis)} KAS</div>
+						<div class="tx-amount">${KAS(tx.satoshis)} HTN</div>
 						<div class="br tx-mass"></div>
 						<div class="br tx-id">
-							<a target="_blank" href="https://explorer.kaspa.org/txs/${tx.txId}">${tx.id}</a>
+							<a target="_blank" href="https://explorer.hoosat.fi/txs/${tx.txId}">${tx.id}</a>
 						</div>
 						<div class="tx-address">
-							<a target="_blank" href="https://explorer.kaspa.org/addresses/${tx.address}">${tx.address}</a>
+							<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 						</div>
 					</div>`
 				})}

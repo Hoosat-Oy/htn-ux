@@ -59,7 +59,7 @@ class KaspaReceiveDialogMobile extends KaspaDialog{
 					@click="${this.copyAddress}" icon="copy"></flow-btn>
 			</flow-input>
 			<flow-input class="amount full-width" suffix-btn
-				label="${T('Amount in KAS')}" @keyup=${this.onAmountChange}
+				label="${T('Amount in HTN')}" @keyup=${this.onAmountChange}
 				value="${this.amount}">
 				<flow-btn slot="suffix" class="primary"
 					@click="${this.showT9}" icon="keyboard"></flow-btn>
@@ -96,7 +96,7 @@ class KaspaReceiveDialogMobile extends KaspaDialog{
 		let {value=''} = input;
 		showT9({
 			value,
-			heading:input.label.replace("in KAS", ""),
+			heading:input.label.replace("in HTN", ""),
 			inputLabel:input.label
 		}, ({value, dialog})=>{
 			console.log("t9 result", value)

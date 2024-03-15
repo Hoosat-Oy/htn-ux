@@ -39,7 +39,7 @@ class KaspaT9Dialog extends KaspaDialog{
 	}
 	renderBody(){
 		let value = this.value || '';
-		let {inputLabel='Amount in KAS'} = this;
+		let {inputLabel='Amount in HTN'} = this;
 		return html`
 		<flow-input class="full-width" clear-btn value="${value}"
 			label="${inputLabel}" readonly @changed=${this.onInputChange}>
@@ -70,7 +70,7 @@ class KaspaT9Dialog extends KaspaDialog{
 		this.value = args.value||'';
 		this.max = args.max||'';
 		this.heading = args.title||args.heading||i18n.t('Amount');
-		this.inputLabel = args.inputLabel||i18n.t('Amount in KAS');
+		this.inputLabel = args.inputLabel||i18n.t('Amount in HTN');
 		this.show();
 	}
     cancel(){

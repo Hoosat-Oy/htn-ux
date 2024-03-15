@@ -51,7 +51,7 @@ class KaspaSendDialog extends KaspaDialog{
 			</flow-input>
 			<div col>
 				<flow-input class="amount full-width" outer-border
-					label="${T('Amount in KAS')}" @keyup=${this.onAmountChange}
+					label="${T('Amount in HTN')}" @keyup=${this.onAmountChange}
 					value="${this.amount}">
 				</flow-input>
 				<div spacer></div>
@@ -76,9 +76,9 @@ class KaspaSendDialog extends KaspaDialog{
 		<div class="estimate-tx">
 			<table>
 				${txSize?html`<tr><td is="i18n-td">Transaction Size</td><td>${txSize.toFileSize()}</td></tr>`:''}
-				${dataFee?html`<tr><td is="i18n-td">Data Fee</td><td>${KAS(dataFee)} KAS</td></tr>`:''}
-				${fee?html`<tr><td is="i18n-td">Total Fee</td><td>${KAS(fee)} KAS</td></tr>`:''}
-				${totalAmount?html`<tr is="i18n-td"><td>Total Amount</td><td> ${KAS(totalAmount)} KAS</td></tr>`:''}
+				${dataFee?html`<tr><td is="i18n-td">Data Fee</td><td>${KAS(dataFee)} HTN</td></tr>`:''}
+				${fee?html`<tr><td is="i18n-td">Total Fee</td><td>${KAS(fee)} HTN</td></tr>`:''}
+				${totalAmount?html`<tr is="i18n-td"><td>Total Amount</td><td> ${KAS(totalAmount)} HTN</td></tr>`:''}
 			</table>
 		</div>
 		`
@@ -183,7 +183,7 @@ class KaspaSendDialog extends KaspaDialog{
     	if(!estimate)
     		return
     	if(estimate.fee > this.alertFeeAmount){
-			let msg = i18n.t('Transaction Fee ([n] KAS) is too large.');
+			let msg = i18n.t('Transaction Fee ([n] HTN) is too large.');
 			msg = msg.replace('[n]', KAS(estimate.fee));
     		let {btn} = await FlowDialog.alert("Warning", 
     			html`${msg}`,

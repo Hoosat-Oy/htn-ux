@@ -407,7 +407,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						<div class="faucet-ux">
 							<div class="margin-bottom"  is="i18n-div">KASPA FAUCET</div>
 							<div>${i18nFormat('Your IP is [n]', this.ip||"")}</div>
-							<div class="margin">${i18nHTMLFormat('You have <b>[n] KAS</b> available.', KAS(this.faucetFundsAvailable||0) )}</div>
+							<div class="margin">${i18nHTMLFormat('You have <b>[n] HTN</b> available.', KAS(this.faucetFundsAvailable||0) )}</div>
 
 							${this.faucetPeriod ? html`
 								<div class="margin-bottom">${i18nHTMLFormat('Additional funds will be<br/>available in [n]', FlowFormat.duration(this.faucetPeriod))}</div>
@@ -449,7 +449,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						</div>
 						<table>
 							<tr><td is="i18n-td">COUNT</td><td>${inUseUTXOs.count}</td></tr>
-							<tr><td is="i18n-td">AMOUNT</td><td>${KAS(inUseUTXOs.satoshis||0)} KAS</td></tr>
+							<tr><td is="i18n-td">AMOUNT</td><td>${KAS(inUseUTXOs.satoshis||0)} HTN</td></tr>
 						</table>
 						<flow-btn class="center-btn primary v-margin"
 							@click="${this.showUTXOs}" i18n>Show UTXOs</flow-btn>
@@ -593,7 +593,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 	openAddressExplorer(address){
 		if (!address)
 			return
-		let url = `https://explorer.kaspa.org/addresses/${address}`;
+		let url = `https://explorer.hoosat.fi/addresses/${address}`;
 
 		window.open(url);
 	}
@@ -610,15 +610,15 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						<span class="value" is="i18n-span">SCANNING...</span>
 					</div>
 					<div class="balance pending">
-						<span class="label-pending">${T('PLEASE WAIT')} <span class="dots">${this.dots}</span> ${total ? this.formatKAS(total)+' KAS':''}</span>
+						<span class="label-pending">${T('PLEASE WAIT')} <span class="dots">${this.dots}</span> ${total ? this.formatKAS(total)+' HTN':''}</span>
 					</div>
 				` : html`
 					<div class="balance">
-						<span class="value">${this.formatKAS(available)} KAS</span>
+						<span class="value">${this.formatKAS(available)} HTN</span>
 					</div>
 					<div class="balance pending">
 						<span class="label-pending" is="i18n-span">Pending:</span>
-						<span class="value-pending">${this.formatKAS(pending)} KAS</span>
+						<span class="value-pending">${this.formatKAS(pending)} HTN</span>
 					</div>
 				`}
             </div>
@@ -693,7 +693,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		})
 	}
 	showReceiveDialog(){
-		let address = this.receiveAddress||'kaspatest:abc'
+		let address = this.receiveAddress||'hoosat:abc'
 		this.receiveDialog.open({wallet:this, address}, (args)=>{
 			//
 		})
