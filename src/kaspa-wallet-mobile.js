@@ -485,7 +485,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		<div class="header" ?not-ready=${!isReady}>
 			<div class="logo">
 				<img class="logo-img" @click=${this.toggleFullScreen}
-					src="${baseUrl+'/resources/images/logo.png'}" />
+					src="/resources/logo512.png" />
 			</div>
 			<div class="flex"></div>
 			<div class='header-status' ?hidden=${!this.isOfflineBadge}>
@@ -512,7 +512,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 	renderLockScreen(){
 		return html`
 			<div class="lock-screen">
-				<div><img class="big-logo" src="/resources/images/kaspa.png"></div>
+				<div><img class="big-logo" src="/resources/logo512.png"></div>
 				<fa-icon icon="lock"></fa-icon>
 				<flow-btn primary i18n @click="${this.unlockWallet}">UNLOCK WALLET</flow-btn>
 			</div>

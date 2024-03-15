@@ -113,7 +113,7 @@ class KaspaOpenDialog extends KaspaDialog{
 		return html`
 			${this.hideLogo?'': html`
 			<div>
-				<img class="big-logo" src="/resources/images/kaspa.png" />
+				<img class="big-logo" src="/resources/logo512.png" />
 			</div>`}
 			<div class="sub-heading" is="i18n-div">Unlock the wallet with your password:</div>
 			<flow-input class="password full-width" outer-border value="${pass}"
