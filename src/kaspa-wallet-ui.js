@@ -1324,13 +1324,12 @@ export class KaspaWalletUI extends BaseElement{
 			address, amount, note, fee,
 			calculateNetworkFee, inclusiveFee
 		} = args;
-		//console.log("sendTx:args", args)
+		console.log("sendTx:args", args)
 		let uid;
 		if(amount > 10){
 			uid = UID();
 			this.addPreparingTransactionNotification({uid, amount, address, note})
 		}
-
 		const response = await this.wallet.submitTransaction({
 			toAddr: address,
 			amount,
