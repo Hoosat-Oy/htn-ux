@@ -325,7 +325,7 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 				</div>
 				<div class="tab-content ${sCls('wallet')}" for="wallet">
 					<div class="wallet-ux">
-						<div class="badge" is="i18n-div">KASPA WALLET</div>
+						<div class="badge" is="i18n-div">HOOSAT WALLET</div>
 						${PWAVersion ? html`<div class="badge"><span is="i18n-span">Version</span> ${PWAVersion}</div>` : ''}
 						<div class="badge"><span is="i18n-span">Status:</span> ${this.status}</div>
 						<div class="badge"><span is="i18n-span">Network:</span> ${(this.receiveAddress || "").split(":")[0] || ""}</div>
@@ -387,11 +387,11 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 								<fa-icon icon="caret-right"></fa-icon>
 								<span is="i18n-span">DEVELOPER INFO</span>
 							</div>
-							<div class="badge"><span is="i18n-span">Kaspa Core:</span> ${window.PWA_MODULES['@kaspa/core-lib']}</div>
-							<div class="badge"><span is="i18n-span">Kaspa Wallet Framework:</span> ${window.PWA_MODULES['@kaspa/wallet']}</div>
-							<div class="badge"><span is="i18n-span">Kaspa gRPC:</span> ${window.PWA_MODULES['@kaspa/grpc']}</div>
-							<div class="badge"><span is="i18n-span">Kaspa gRPC Relay:</span> ${window.PWA_MODULES['@kaspa/grpc-web']}</div>
-							<div class="badge"><span is="i18n-span">Kaspa UX:</span> ${window.PWA_MODULES['@kaspa/ux']}</div>
+							<div class="badge"><span is="i18n-span">Hoosat Core:</span> ${window.PWA_MODULES['@kaspa/core-lib']}</div>
+							<div class="badge"><span is="i18n-span">Hoosat Wallet Framework:</span> ${window.PWA_MODULES['@kaspa/wallet']}</div>
+							<div class="badge"><span is="i18n-span">Hoosat gRPC:</span> ${window.PWA_MODULES['@kaspa/grpc']}</div>
+							<div class="badge"><span is="i18n-span">Hoosat gRPC Relay:</span> ${window.PWA_MODULES['@kaspa/grpc-web']}</div>
+							<div class="badge"><span is="i18n-span">Hoosat UX:</span> ${window.PWA_MODULES['@kaspa/ux']}</div>
 							<div class="badge"><span is="i18n-span">Flow UX:</span> ${window.PWA_MODULES['@aspectron/flow-ux']}</div>
 						</flow-expandable>
 
@@ -402,7 +402,7 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 					${this.faucetStatus ? this.faucetStatus : html`
 
 						<div class="faucet-ux">
-							<div class="margin-bottom"  is="i18n-div">KASPA FAUCET</div>
+							<div class="margin-bottom"  is="i18n-div">HOOSAT FAUCET</div>
 							<div>${i18nFormat('Your IP is [n]', this.ip || "")}</div>
 							<div class="margin">${i18nHTMLFormat('You have <b>[n] HTN</b> available.', KAS(this.faucetFundsAvailable || 0))}</div>
 

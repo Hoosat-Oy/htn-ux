@@ -1071,7 +1071,7 @@ export class KaspaWalletUI extends BaseElement {
 		let title = html`<fa-icon class="big warning" 
 			icon="exclamation-triangle"></fa-icon> ${T('Attention !')}`;
 
-		let body = html`${i18nHTMLFormat(`'utxoindex' flag is missing from KASPAD config.<br />
+		let body = html`${i18nHTMLFormat(`'utxoindex' flag is missing from HOOSATD config.<br />
 			Please inform the wallet administrator.<br />`)}
 		`
 		let { btn } = await FlowDialog.alert({
@@ -1178,7 +1178,7 @@ export class KaspaWalletUI extends BaseElement {
 		console.log("$$$$$$$ INIT NETWORK SETTINGS", { network, rpc });
 
 		if (!rpc)
-			return FlowDialog.alert(i18n.t("Error"), i18n.t("Kaspa Daemon config is missing."));
+			return FlowDialog.alert(i18n.t("Error"), i18n.t("Hoosat Daemon config is missing."));
 
 		this.initDaemonRPC();
 		this.initHelpers();
@@ -1284,7 +1284,7 @@ export class KaspaWalletUI extends BaseElement {
 
 	async isValidAddress(address) {
 		let [prefix] = address.split(":");
-		if (window.mobileMode && prefix == "kaspatest")
+		if (window.mobileMode && prefix == "hoosattest")
 			return true;
 
 		let minningAddress = await this.getMiningAddress()
@@ -1433,11 +1433,11 @@ export class KaspaWalletUI extends BaseElement {
 			value: '',
 			max,
 			heading: i18n.t('Request funds'),
-			inputLabel: i18n.t('Amount in KAS')
+			inputLabel: i18n.t('Amount in HTN')
 		}, ({ value: amount, dialog }) => {
 			let sompis = formatForMachine(amount || 0);
 			if (sompis > this.faucetFundsAvailable) {
-				let msg = i18n.t(`You can't request more than [n] KAS.`)
+				let msg = i18n.t(`You can't request more than [n] HTN.`)
 					.replace("[n]", KAS(this.faucetFundsAvailable || 0))
 				return dialog.setError(msg);//'
 			}
