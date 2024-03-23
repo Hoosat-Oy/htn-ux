@@ -12,51 +12,51 @@ import {
 	askForPassword
 } from './wallet.js';
 export * from './wallet.js';
-import {initKaspaFramework, Wallet, workerLog} from '@kaspa/wallet-worker';
-export {Wallet};
+import { initKaspaFramework, Wallet, workerLog } from '@kaspa/wallet-worker';
+export { Wallet };
 Wallet.setWorkerLogLevel(localStorage.walletWorkerLogLevel || 'none')
 
-export {html, css, FlowFormat, dpc, baseUrl, debug};
+export { html, css, FlowFormat, dpc, baseUrl, debug };
 
-export class KaspaWalletUI extends BaseElement{
+export class KaspaWalletUI extends BaseElement {
 
 	static get properties() {
 		return {
-			wallet:{type:Object},
-			autoCompound:{type:Boolean},
-			useLatestAddressForCompound:{type:Boolean},
-			isLoading:{type:Boolean},
-			isOnline:{type:Boolean},
-			isOfflineBadge:{type:Boolean},
-			errorMessage:{type:String},
-			receiveAddress:{type:String},
-			changeAddress:{type:String},
-			blueScore:{type:Number},
-			status:{type:String},
-			walletMeta:{type:Object, value:{}},
+			wallet: { type: Object },
+			autoCompound: { type: Boolean },
+			useLatestAddressForCompound: { type: Boolean },
+			isLoading: { type: Boolean },
+			isOnline: { type: Boolean },
+			isOfflineBadge: { type: Boolean },
+			errorMessage: { type: String },
+			receiveAddress: { type: String },
+			changeAddress: { type: String },
+			blueScore: { type: Number },
+			status: { type: String },
+			walletMeta: { type: Object, value: {} },
 
-			faucetFundsAvailable:{type:Number},
-			faucetPeriod:{type:Number},
-			faucetStatus:{type:String},
-			ip:{type:String},
+			faucetFundsAvailable: { type: Number },
+			faucetPeriod: { type: Number },
+			faucetStatus: { type: String },
+			ip: { type: String },
 
-			blockCount:{type:Number},
-			headerCount:{type:Number},
-			difficulty:{type:Number},
-			networkName:{type:String},
-			pastMedianTime:{type:Number},
-			pastMediaTimeDiff:{type:Number},
-			dots:{type:String},
-			hideFaucet:{type:Boolean},
-			hideNetwork:{type:Boolean},
-			hideDebug:{type:Boolean},
-			hideQRScanner:{type:Boolean},
-			hideOpenWalletLogo:{type:Boolean},
-			skipUTXOIndexCheck:{type:Boolean}
+			blockCount: { type: Number },
+			headerCount: { type: Number },
+			difficulty: { type: Number },
+			networkName: { type: String },
+			pastMedianTime: { type: Number },
+			pastMediaTimeDiff: { type: Number },
+			dots: { type: String },
+			hideFaucet: { type: Boolean },
+			hideNetwork: { type: Boolean },
+			hideDebug: { type: Boolean },
+			hideQRScanner: { type: Boolean },
+			hideOpenWalletLogo: { type: Boolean },
+			skipUTXOIndexCheck: { type: Boolean }
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [ScrollbarStyle, SpinnerStyle, txListStyle, css`
 			.v-box{display:flex;flex-direction:column}
 			.hide-scrollbar::-webkit-scrollbar-track{
@@ -120,7 +120,7 @@ export class KaspaWalletUI extends BaseElement{
 		this.walletSignal = Deferred();
 		this.walletMeta = {};
 		this.isOnline = false;
-		this.txLimit = Math.floor( (window.innerHeight - 165) / 72);
+		this.txLimit = Math.floor((window.innerHeight - 165) / 72);
 		this.utxosLimit = this.txLimit;
 		this.hideUTXOs = true;
 
@@ -133,11 +133,11 @@ export class KaspaWalletUI extends BaseElement{
 		this.walletDebugInfo = {};
 		this.reloadingUTXOs = false;
 
-		this.throttledCompoundUTXO = throttle(async ()=>{
-			if(this.waitingForCompound)
+		this.throttledCompoundUTXO = throttle(async () => {
+			if (this.waitingForCompound)
 				return
 			this.waitingForCompound = true;
-			if (this.autoCompound){
+			if (this.autoCompound) {
 				await this._compoundUTXOs(15000, false);
 				this.waitingForCompound = false;
 				return
@@ -147,63 +147,63 @@ export class KaspaWalletUI extends BaseElement{
 				This wallet has too many transactions<br >
 				would you like to compound by re-sending funds to yourself?
 			`;
-			let {btn} = await FlowDialog.alert({
-				title:i18n.t("Too many transactions"),
+			let { btn } = await FlowDialog.alert({
+				title: i18n.t("Too many transactions"),
 				body,
-				cls:'',
-				btns:[{
-					text:i18n.t('Close'),
-					value:'cancel'
-				},{
-					text:i18n.t('Yes Compound'),
-					cls:'primary',
-					value:'compound'
+				cls: '',
+				btns: [{
+					text: i18n.t('Close'),
+					value: 'cancel'
+				}, {
+					text: i18n.t('Yes Compound'),
+					cls: 'primary',
+					value: 'compound'
 				}]
 			})
 
-			if(btn=='compound'){
+			if (btn == 'compound') {
 				await this.compoundUTXOs();
 			}
 			this.waitingForCompound = false;
 		}, 1000)
 	}
 
-	setRPCBuilder(rpcBuilder){
+	setRPCBuilder(rpcBuilder) {
 		this.rpcBuilder = rpcBuilder;
 	}
 
 	async initNetworkSettings() {
-		if(this.rpc) {
+		if (this.rpc) {
 			this.rpc.disconnect();
 			// !!! FIXME delete wallet instance?
 			delete this.rpc;
 		}
 
-		if(!this.rpcBuilder)
+		if (!this.rpcBuilder)
 			return false;
-		
+
 		//const { network, port } = this.local_kaspad_settings;
 		//const port = Wallet.networkTypes[network].port;
-		const {rpc, network} = this.rpcBuilder();//new RPC({ clientConfig:{ host : `127.0.0.1:${port}` } });
+		const { rpc, network } = this.rpcBuilder();//new RPC({ clientConfig:{ host : `127.0.0.1:${port}` } });
 		this.network = network;
 		this.rpc = rpc;
 	}
-	disconnectRPC(){
-		if(this.rpc)
+	disconnectRPC() {
+		if (this.rpc)
 			this.rpc.disconnect()
 	}
-	async connectRPC(){
-		if(this.rpc)
+	async connectRPC() {
+		if (this.rpc)
 			return this.rpc.connect()
 	}
 
 	initDaemonRPC() {
-		if(this.networkStatusUpdates || !window.flow?.app?.rpc?.subscribe)
+		if (this.networkStatusUpdates || !window.flow?.app?.rpc?.subscribe)
 			return
 		const { rpc } = flow.app;
 		this.networkStatusUpdates = rpc.subscribe(`network-status`);
-		(async()=>{
-			for await(const msg of this.networkStatusUpdates) {
+		(async () => {
+			for await (const msg of this.networkStatusUpdates) {
 
 				const {
 					blockCount,
@@ -225,39 +225,39 @@ export class KaspaWalletUI extends BaseElement{
 	}
 
 	initHelpers() {
-		if(this._initHelpersInterval)
+		if (this._initHelpersInterval)
 			return;
 
-		this._initHelpersInterval = setInterval(()=>{
-			if(this.faucetPeriod > 0) {
-				this.faucetPeriod = Math.max(0,this.faucetPeriod-1000);
+		this._initHelpersInterval = setInterval(() => {
+			if (this.faucetPeriod > 0) {
+				this.faucetPeriod = Math.max(0, this.faucetPeriod - 1000);
 			}
 		}, 1000);
 	}
 
-	render(){
+	render() {
 		return html``
 	}
 
-	renderTX({hideTxBtn=false, onlyNonConfirmed=false}={}){
-		if(!this.wallet)
+	renderTX({ hideTxBtn = false, onlyNonConfirmed = false } = {}) {
+		if (!this.wallet)
 			return '';
 
 		let items = [], bScore;
-		let {blueScore=0} = this;
-		if(onlyNonConfirmed){
-			if(blueScore){
-				items = this.txs.slice(0, 6).filter(tx=>{
-					bScore = tx.blueScore||0;
-					if(blueScore<bScore || !bScore)
+		let { blueScore = 0 } = this;
+		if (onlyNonConfirmed) {
+			if (blueScore) {
+				items = this.txs.slice(0, 6).filter(tx => {
+					bScore = tx.blueScore || 0;
+					if (blueScore < bScore || !bScore)
 						return false
-					return (blueScore - bScore < (tx.isCoinbase? COINBASE_CFM_COUNT : CONFIRMATION_COUNT))
+					return (blueScore - bScore < (tx.isCoinbase ? COINBASE_CFM_COUNT : CONFIRMATION_COUNT))
 				})
 			}
-		}else{
+		} else {
 			items = this.txs.slice(0, 10)
 		}
-		if(hideTxBtn && !items.length && !this.preparingTxNotifications.size)
+		if (hideTxBtn && !items.length && !this.preparingTxNotifications.size)
 			return '';
 
 		let color, p, cfmP, cfm;
@@ -270,115 +270,114 @@ export class KaspaWalletUI extends BaseElement{
 				${this.recentTransactionsHeading}
 			</div>
 			<div class="tx-notifications">
-				${notifications.map(n=>{
-					return html`<div class="tx-notification">
-						${n.compoundUTXOs?
-							T(`Compounding UTXOs...`):
-							i18n.t(`Preparing transaction for [n] HTN ....`)
-							.replace('[n]', this.formatKAS(n.amount))}
+				${notifications.map(n => {
+			return html`<div class="tx-notification">
+						${n.compoundUTXOs ?
+					T(`Compounding UTXOs...`) :
+					i18n.t(`Preparing transaction for [n] HTN ....`)
+						.replace('[n]', this.formatKAS(n.amount))}
 					</div>`
-				})}
+		})}
 				
 			</div>
 			<div class="tx-rows">
-			${items.map(tx=>{
-				let COUNT = tx.isCoinbase? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
-				cfm = blueScore - (tx.blueScore||0);
-				cfmP = Math.min(COUNT, cfm);
-				p = cfmP/COUNT;
-				if(p>0.7)
-					color = '#60b686';
-				else if(p>0.5)
-					color = 'orange'
-				else
-					color = 'red';
+			${items.map(tx => {
+			let COUNT = tx.isCoinbase ? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
+			cfm = blueScore - (tx.blueScore || 0);
+			cfmP = Math.min(COUNT, cfm);
+			p = cfmP / COUNT;
+			if (p > 0.7)
+				color = '#60b686';
+			else if (p > 0.5)
+				color = 'orange'
+			else
+				color = 'red';
 
-				return html`
+			return html`
 					<flow-expandable class="tx-row" static-icon expand ?txin=${tx.in} ?txmoved=${tx.isMoved} ?txout=${!tx.in}
-						icon="${tx.in?'sign-in':'sign-out'}" no-info>
+						icon="${tx.in ? 'sign-in' : 'sign-out'}" no-info>
 						<div class="tx-title" slot="title">
 							<div class="tx-date flex">${tx.date}</div>
 							<div class="amount">
-								${tx.in?'':'-'}${this.formatKAS(tx.amount)} HTN
+								${tx.in ? '' : '-'}${this.formatKAS(tx.amount)} HTN
 							</div>
 						</div>
-						${ 0<=cfm&cfm<=COUNT? html`<flow-progressbar class="tx-progressbar" 
+						${0 <= cfm & cfm <= COUNT ? html`<flow-progressbar class="tx-progressbar" 
 							style="--flow-progressbar-color:${color}"
-							value="${p}" text="${cfmP||''}"></flow-progressbar>`:''
-						}
+							value="${p}" text="${cfmP || ''}"></flow-progressbar>` : ''
+				}
 						<div class="tx-body">
 							${tx.note}
 							<div class="tx-id">
 								<a target="_blank" href="https://explorer.hoosat.fi/txs/${tx.id}">${tx.id}</a>
 							</div>
 							<div class="tx-address">
-								${tx.myAddress?T('COMPOUNDING WALLET => '):''}
+								${tx.myAddress ? T('COMPOUNDING WALLET => ') : ''}
 								<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 							</div>
 						</div>
 					</flow-expandable>
 				`
-			})}
+		})}
 			</div>
 		</div>`
 	}
-	_renderAllTX({skip, items}){
-		let {blueScore=0} = this, cfm, cfmP, p, color, bScore;
+	_renderAllTX({ skip, items }) {
+		let { blueScore = 0 } = this, cfm, cfmP, p, color, bScore;
 		return html`
-			${items.length?'':html`<div class="no-record" is="i18n-div">No Transactions</div>`}
+			${items.length ? '' : html`<div class="no-record" is="i18n-div">No Transactions</div>`}
 			<div class="tx-list">
-				${items.map((tx, i)=>{
-					let COUNT = tx.isCoinbase? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
-					bScore = tx.blueScore||0;
-					cfm = blueScore - bScore;
-					if(blueScore < bScore)
-						cfm = COUNT+1;
-					cfmP = Math.min(COUNT, cfm)
-					p = cfmP/COUNT;
-					if(p>0.7)
-						color = '#60b686';
-					else if(p>0.5)
-						color = 'orange'
-					else
-						color = 'red';
-					return html`
+				${items.map((tx, i) => {
+			let COUNT = tx.isCoinbase ? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
+			bScore = tx.blueScore || 0;
+			cfm = blueScore - bScore;
+			if (blueScore < bScore)
+				cfm = COUNT + 1;
+			cfmP = Math.min(COUNT, cfm)
+			p = cfmP / COUNT;
+			if (p > 0.7)
+				color = '#60b686';
+			else if (p > 0.5)
+				color = 'orange'
+			else
+				color = 'red';
+			return html`
 					<div class="tx-row" ?txin=${tx.in} tx-version=${tx.version} ?txmoved=${tx.isMoved} ?txout=${!tx.in}>
-						<fa-icon class="tx-icon" icon="${tx.in?'sign-in':'sign-out'}"></fa-icon>
-						${
-							0<=cfm&cfm<=COUNT? html`
+						<fa-icon class="tx-icon" icon="${tx.in ? 'sign-in' : 'sign-out'}"></fa-icon>
+						${0 <= cfm & cfm <= COUNT ? html`
 							<flow-progressbar class="tx-progressbar" 
 								style="--flow-progressbar-color:${color}"
-								value="${p}" text="${cfmP||''}"></flow-progressbar>
-							`:''
-						}
-						<div class="tx-date" title="#${skip+i+1} Transaction">${tx.date}</div>
-						<div class="tx-amount">${tx.in?'':'-'}${KAS(tx.amount)} HTN</div>
+								value="${p}" text="${cfmP || ''}"></flow-progressbar>
+							`: ''
+				}
+						<div class="tx-date" title="#${skip + i + 1} Transaction">${tx.date}</div>
+						<div class="tx-amount">${tx.in ? '' : '-'}${KAS(tx.amount)} HTN</div>
 						<div class="br tx-note">${tx.note}</div>
 						<div class="br tx-id">
 							<a target="_blank" href="https://explorer.hoosat.fi/txs/${tx.id.split(":")[0]}">${tx.id.split(":")[0]}</a>
 						</div>
 						<div class="tx-address">
-							${tx.myAddress?T('COMPOUNDING WALLET => '):''}
+							${tx.myAddress ? T('COMPOUNDING WALLET => ') : ''}
 							<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 						</div>
 					</div>`
-				})}
+		})}
 			</div>
 		`
 	}
 
-	async forceTxTimeUpdate(){
+	async forceTxTimeUpdate() {
 		this.selectTab("wallet");
 		await this.updateTransactionsTimeImpl(10);
 	}
-	async updateTransactionsTime(){
+	async updateTransactionsTime() {
 		await this.updateTransactionsTimeImpl();
 	}
 
-	async updateTransactionsTimeImpl(version){
-		if(!this.wallet)
+	async updateTransactionsTimeImpl(version) {
+		if (!this.wallet)
 			return
-		if (this.updatingTransactionsTime){
+		if (this.updatingTransactionsTime) {
 			FlowDialog.alert(
 				i18n.t('Updating transaction times'),
 				i18n.t('Transactions update process is in-progress'),
@@ -386,104 +385,104 @@ export class KaspaWalletUI extends BaseElement{
 			return
 		}
 
-		let {btn} = await FlowDialog.alert({
-			title:i18n.t('Update transaction times'),
-			body:html`<div>${i18n.t('Updating transaction times may take time if you have a lot of transactions,')}</div>
+		let { btn } = await FlowDialog.alert({
+			title: i18n.t('Update transaction times'),
+			body: html`<div>${i18n.t('Updating transaction times may take time if you have a lot of transactions,')}</div>
 					 <div>${i18n.t('are you sure?')}</div>`,
-			cls:'with-icon',
-			btns:[{
-				text:i18n.t('Cancel'),
-				value:'cancel'
-			},{
-				text:i18n.t('Update'),
-				value:'update',
-				cls:'primary'
+			cls: 'with-icon',
+			btns: [{
+				text: i18n.t('Cancel'),
+				value: 'cancel'
+			}, {
+				text: i18n.t('Update'),
+				value: 'update',
+				cls: 'primary'
 			}]
 		})
-		if(btn != 'update')
+		if (btn != 'update')
 			return
-	
+
 		this.updatingTransactionsTime = true;
 		this.requestUpdate("updatingTransactionsTime", null);
 
-		return new Promise((resolve)=>{
-			dpc(2000, async()=>{
+		return new Promise((resolve) => {
+			dpc(2000, async () => {
 				//let version = localStorage.force_tx_time==1?5:undefined;
 				//console.log("force_tx_time:version", version);
 				let response = await this.wallet.startUpdatingTransactions(version)
-				.catch(err=>{
-					console.log("updateTransactionsTime error", err)
-					let error = err.error || err.message || i18n.t('Unable to update transactions time. Please retry later.');
-					FlowDialog.alert(
-						i18n.t('Transactions update process failed'),
-						html`${error}${this.buildDebugInfoForDialog(err)}`
-					)
-				})
-				if(response)
+					.catch(err => {
+						console.log("updateTransactionsTime error", err)
+						let error = err.error || err.message || i18n.t('Unable to update transactions time. Please retry later.');
+						FlowDialog.alert(
+							i18n.t('Transactions update process failed'),
+							html`${error}${this.buildDebugInfoForDialog(err)}`
+						)
+					})
+				if (response)
 					console.log("updateTransactionsTime response", response)
 				resolve()
 			})
 		})
 	}
 
-	exportTransactions(){
-		let {txs:items=[], blueScore=0} = this;
+	exportTransactions() {
+		let { txs: items = [], blueScore = 0 } = this;
 
 		let fields = ["date", "id", "address", "amount", "direction", "confirmation", "note", "compounding wallet"];
 		let rows = [];
 
-		rows.push(fields.map(field=>{
+		rows.push(fields.map(field => {
 			return field.toUpperCase()
 		}).join(","))
 
-		let escape = str=>{
+		let escape = str => {
 			return `"${str.replaceAll('"', '""')}"`
 		}
 
-		items.map((tx, i)=>{
-			if (tx.isMoved){
+		items.map((tx, i) => {
+			if (tx.isMoved) {
 				return
 			}
-			let COUNT = tx.isCoinbase? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
-			let bScore = tx.blueScore||0;
+			let COUNT = tx.isCoinbase ? COINBASE_CFM_COUNT : CONFIRMATION_COUNT;
+			let bScore = tx.blueScore || 0;
 			let cfm = blueScore - bScore;
-			if(blueScore < bScore)
-				cfm = COUNT+1;
+			if (blueScore < bScore)
+				cfm = COUNT + 1;
 			let cfmP = Math.min(COUNT, cfm)
-			cfm = (cfmP/COUNT).toFixed(2);
+			cfm = (cfmP / COUNT).toFixed(2);
 			let row = [];
-			fields.forEach(field=>{
-				switch(field){
+			fields.forEach(field => {
+				switch (field) {
 					case 'id':
 						row.push(tx.id.split(":")[0])
-					break;
+						break;
 					case 'address':
 						row.push(tx.address)
-					break;
+						break;
 					case 'amount':
-						row.push(escape(`${tx.in?'':'-'}${KAS(tx.amount)}`))
-					break;
+						row.push(escape(`${tx.in ? '' : '-'}${KAS(tx.amount)}`))
+						break;
 					case 'direction':
-						row.push(tx.in?'RECEIVE':'SEND')
-					break;
+						row.push(tx.in ? 'RECEIVE' : 'SEND')
+						break;
 					case 'confirmation':
 						row.push(cfm)
-					break;
+						break;
 					case 'note':
-						row.push(escape(tx.note||''))
-					break;
+						row.push(escape(tx.note || ''))
+						break;
 					case 'compounding wallet':
-						row.push(tx.myAddress?'YES':'')
-					break;
+						row.push(tx.myAddress ? 'YES' : '')
+						break;
 					case 'date':
-						if (tx.version==1){
+						if (tx.version == 1) {
 							row.push('N/A');
-						}else if (tx.version==2){
+						} else if (tx.version == 2) {
 							row.push(tx.date)
-						}else{
+						} else {
 							row.push('')
 						}
-					break;
+						break;
 
 				}
 			});
@@ -494,29 +493,29 @@ export class KaspaWalletUI extends BaseElement{
 		let csvData = rows.join("\n");
 		this.sendDataToDownload(csvData, 'transactions.csv')
 	}
-	renderAllTX(){
-		if(!this.wallet)
+	renderAllTX() {
+		if (!this.wallet)
 			return '';
-		let {txLimit:limit=20, txs:totalItems=[], txSkip=0} = this;
+		let { txLimit: limit = 20, txs: totalItems = [], txSkip = 0 } = this;
 		let pagination = buildPagination(totalItems.length, txSkip, limit)
-		let items = totalItems.slice(txSkip, txSkip+limit);
+		let items = totalItems.slice(txSkip, txSkip + limit);
 		return html`
-			${this._renderAllTX({skip:txSkip, items})}
+			${this._renderAllTX({ skip: txSkip, items })}
 			${renderPagination(pagination, this._onTXPaginationClick)}
 		`
 	}
-	_renderUTXOs({skip, items}){
-		let noRecordMsg = this.reloadingUTXOs?
-			html`<div class="no-record" is="i18n-div">Loading...</div>`:
+	_renderUTXOs({ skip, items }) {
+		let noRecordMsg = this.reloadingUTXOs ?
+			html`<div class="no-record" is="i18n-div">Loading...</div>` :
 			html`<div class="no-record" is="i18n-div">No UTXOS</div>`;
 
 		return html`
-			${items.length?'':noRecordMsg}
+			${items.length ? '' : noRecordMsg}
 			<div class="tx-list">
-				${items.map((tx, i)=>{
-					return html`
+				${items.map((tx, i) => {
+			return html`
 					<div class="tx-row" ?iscoinbase=${!tx.isCoinbase}>
-						<div class="tx-date" title="#${skip+i+1} UTXO">
+						<div class="tx-date" title="#${skip + i + 1} UTXO">
 							${tx.blockDaaScore} (${tx.mass})
 						</div>
 						<div class="tx-amount">${KAS(tx.satoshis)} HTN</div>
@@ -528,85 +527,85 @@ export class KaspaWalletUI extends BaseElement{
 							<a target="_blank" href="https://explorer.hoosat.fi/addresses/${tx.address}">${tx.address}</a>
 						</div>
 					</div>`
-				})}
+		})}
 			</div>
 		`
 	}
 
-	renderUTXOs(){
-		if(!this.wallet)
+	renderUTXOs() {
+		if (!this.wallet)
 			return '';
-		let {utxosLimit:limit=20, utxos:totalItems, utxoSkip:skip=0} = this;
+		let { utxosLimit: limit = 20, utxos: totalItems, utxoSkip: skip = 0 } = this;
 		let pagination = buildPagination(totalItems.size, skip, limit)
-		let items = [...totalItems.values()].slice(skip, skip+limit);
+		let items = [...totalItems.values()].slice(skip, skip + limit);
 		return html`
-			${this._renderUTXOs({skip, items})}
+			${this._renderUTXOs({ skip, items })}
 			${renderPagination(pagination, this._onUTXOPaginationClick)}`
 	}
 
-	onMenuClick(e){
+	onMenuClick(e) {
 		let target = e.target.closest("flow-menu-item")
 		let action = target.dataset.action;
-		if(!action)
+		if (!action)
 			return
-		if(!this[action])
+		if (!this[action])
 			return
 		this[action]()
 	}
 
-	async showSeeds(){
-		askForPassword({confirmBtnText:i18n.t("Next")}, async({btn, password})=>{
-    		if(btn!="confirm")
-    			return
-    		let encryptedMnemonic = getLocalWallet().mnemonic;
-    		let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
-    		if(!valid)
-    			return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
+	async showSeeds() {
+		askForPassword({ confirmBtnText: i18n.t("Next") }, async ({ btn, password }) => {
+			if (btn != "confirm")
+				return
+			let encryptedMnemonic = getLocalWallet().mnemonic;
+			let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
+			if (!valid)
+				return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
 			let mnemonic = await this.wallet.mnemonic;
-			this.openSeedsDialog({mnemonic, hideable:true, showOnlySeed:true}, ()=>{
+			this.openSeedsDialog({ mnemonic, hideable: true, showOnlySeed: true }, () => {
 				//
 			})
 		})
 	}
-	async exportWalletFile(){
-		askForPassword({confirmBtnText:i18n.t("Next")}, async({btn, password})=>{
-    		if(btn!="confirm")
-    			return
-    		let wallet = getLocalWallet();
-    		let encryptedMnemonic = wallet.mnemonic;
-    		let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
-    		if(!valid)
-    			return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
-			
+	async exportWalletFile() {
+		askForPassword({ confirmBtnText: i18n.t("Next") }, async ({ btn, password }) => {
+			if (btn != "confirm")
+				return
+			let wallet = getLocalWallet();
+			let encryptedMnemonic = wallet.mnemonic;
+			let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
+			if (!valid)
+				return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
+
 			this.sendDataToDownload(JSON.stringify(wallet), 'wallet.kpk')
 		})
 	}
-	getFileInput(){
+	getFileInput() {
 		return this.renderRoot.querySelector("input.hidden-file-input")
 	}
-	importWalletFile(){
+	importWalletFile() {
 		let input = this.getFileInput();
 		let a = Date.now();
-		let invalidFileAlert = ()=>{
+		let invalidFileAlert = () => {
 			FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid File"));
 		}
-		let importWallet = (walletMeta)=>{
-			let {mnemonic} = walletMeta.wallet;
+		let importWallet = (walletMeta) => {
+			let { mnemonic } = walletMeta.wallet;
 
-			askForPassword({confirmBtnText:"Import"}, async({btn, password})=>{
-	    		if(btn!="confirm")
-	    			return
+			askForPassword({ confirmBtnText: "Import" }, async ({ btn, password }) => {
+				if (btn != "confirm")
+					return
 				let valid = await Wallet.checkPasswordValidity(password, mnemonic)
-				if(!valid)
+				if (!valid)
 					return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
 
 				let walletInitArgs = {
 					password,
 					walletMeta,
-					encryptedMnemonic:mnemonic,
-					dialog:{
-						mode:"import",
-						setError:(error)=>{
+					encryptedMnemonic: mnemonic,
+					dialog: {
+						mode: "import",
+						setError: (error) => {
 							FlowDialog.alert(i18n.t("Error"), error);
 						}
 					}
@@ -615,30 +614,30 @@ export class KaspaWalletUI extends BaseElement{
 				this.handleInitDialogCallback(walletInitArgs)
 			})
 		}
-		input.onchange = (e)=>{
-			let [file] = input.files||[]
-			if(!file)
+		input.onchange = (e) => {
+			let [file] = input.files || []
+			if (!file)
 				return
-			let {name=''} = file;
+			let { name = '' } = file;
 			let ext = name.toLowerCase().split(".").pop();
-			if(ext!='kpk')
+			if (ext != 'kpk')
 				return invalidFileAlert();
 
 			let reader = new FileReader();
 			let error = false;
-			reader.onload = async (evt)=>{
+			reader.onload = async (evt) => {
 				input.value = "";
 				let json = evt.target.result;
-				try{
+				try {
 					let walletInfo = JSON.parse(json);
-					if(!walletInfo?.wallet?.mnemonic)
+					if (!walletInfo?.wallet?.mnemonic)
 						return invalidFileAlert();
 					importWallet(walletInfo);
-				}catch(e){
+				} catch (e) {
 					invalidFile()
 				}
 			};
-			reader.onerror = ()=>{
+			reader.onerror = () => {
 				FlowDialog.alert(i18n.t("Error"), i18n.t("Unable to read file"));
 				error = true;
 				input.value = "";
@@ -649,7 +648,7 @@ export class KaspaWalletUI extends BaseElement{
 		input.click();
 	}
 
-	sendDataToDownload(data, name="wallet.txt"){
+	sendDataToDownload(data, name = "wallet.txt") {
 		let file = new File([data], name, {
 			type: "attachment/kpk",
 		});
@@ -657,18 +656,18 @@ export class KaspaWalletUI extends BaseElement{
 		this.requestFileDownload(objectURL, name);
 	}
 
-	requestFileDownload(file, name){
+	requestFileDownload(file, name) {
 		let link = document.createElement("a")
 		link.setAttribute("href", file);
 		link.setAttribute("download", name || file);
 		document.body.appendChild(link);
 		link.click();
-		setTimeout(()=>{
+		setTimeout(() => {
 			link.remove();
 		}, 3000);
 	}
 
-	async showRecoverWallet(){
+	async showRecoverWallet() {
 		let title = html`<fa-icon class="big warning"
 			icon="exclamation-triangle"></fa-icon> ${T('Attention !')}`;
 		let body = html`
@@ -678,51 +677,51 @@ export class KaspaWalletUI extends BaseElement{
 				is backed up before proceeding!
 			</div>
 		`
-		let {btn} = await FlowDialog.alert({
+		let { btn } = await FlowDialog.alert({
 			title,
 			body,
-			cls:'with-icon', 
-			btns:[{
-				text:i18n.t('Cancel'),
-				value:'cancel'
-			},{
-				text:i18n.t('Next'),
-				value:'next',
-				cls:'primary'
+			cls: 'with-icon',
+			btns: [{
+				text: i18n.t('Cancel'),
+				value: 'cancel'
+			}, {
+				text: i18n.t('Next'),
+				value: 'next',
+				cls: 'primary'
 			}]
 		})
-		if(btn != 'next')
+		if (btn != 'next')
 			return
 		showWalletInitDialog({
-			mode:"recover",
-			wallet:this,
-			backToWallet:true
-		}, (err, info)=>{
+			mode: "recover",
+			wallet: this,
+			backToWallet: true
+		}, (err, info) => {
 			this.handleInitDialogCallback(info)
 		})
 	}
 
-	copyAddress(){
+	copyAddress() {
 		let input = this.renderRoot.querySelector(".address-input");
 		this.copyInputToClipboard(input)
 	}
-	copyInputToClipboard(input){
+	copyInputToClipboard(input) {
 		input.select();
 		input.setSelectionRange(0, 99999)
 		document.execCommand("copy");
-		input.setSelectionRange(0,0)
+		input.setSelectionRange(0, 0)
 		input.blur();
 	}
-	
-	formatKAS(value){
+
+	formatKAS(value) {
 		return KAS(value);
 	}
-	showError(err){
+	showError(err) {
 		console.log("showError:err", err)
-		this.errorMessage = err.error || err+"";
+		this.errorMessage = err.error || err + "";
 	}
-	async setWallet(wallet){
-		if(localStorage.walletLogLevel)
+	async setWallet(wallet) {
+		if (localStorage.walletLogLevel)
 			wallet.setLogLevel(localStorage.walletLogLevel)
 		//console.log("setWallet:", wallet)
 		this.txs = [];
@@ -736,90 +735,90 @@ export class KaspaWalletUI extends BaseElement{
 
 	refreshStats() {
 		this.isOfflineBadge = !this.isOnline;
-		if(!this.isOnline){
+		if (!this.isOnline) {
 			this.status = 'Offline';
 			return;
 		}
 
 		let status = i18n.t('Online');
-		if(this.blockCount == 1) {
+		if (this.blockCount == 1) {
 			status = i18n.t(`Syncing Headers`);
 		}
 		else {
-			if(this.sync && this.sync < 99.95)
+			if (this.sync && this.sync < 99.95)
 				status = i18n.t(`Syncing DAG [n]`).replace('[n]', `${this.sync.toFixed(2)}%`);
 		}
 		this.status = status;
 	}
 
-	async onWalletReady({confirmedUtxosCount}){
+	async onWalletReady({ confirmedUtxosCount }) {
 		this.compoundIfNeeded(confirmedUtxosCount)
 	}
-	async compoundIfNeeded(utxoCount){
-		if(utxoCount < MAX_UTXOS_THRESHOLD_COMPOUND)
+	async compoundIfNeeded(utxoCount) {
+		if (utxoCount < MAX_UTXOS_THRESHOLD_COMPOUND)
 			return
 		this.throttledCompoundUTXO();
 	}
 
-	buildDebugInfoForDialog(err){
-		let {debugInfo, extraDebugInfo} = err;
-		if (debugInfo || extraDebugInfo){
+	buildDebugInfoForDialog(err) {
+		let { debugInfo, extraDebugInfo } = err;
+		if (debugInfo || extraDebugInfo) {
 			return html`
 			<flow-expandable no-info>
 				<div slot="title">More Info:</div>
 				<div class="error-debug-info">
-					${extraDebugInfo?JSON.stringify(extraDebugInfo):''}
+					${extraDebugInfo ? JSON.stringify(extraDebugInfo) : ''}
 					<br /><hr /><br />
-					${debugInfo?JSON.stringify(debugInfo):''}
+					${debugInfo ? JSON.stringify(debugInfo) : ''}
 				</div>
 			</flow-expandable>`;
 		}
 		return '';
 	}
 
-	compoundUTXOs(){
+	compoundUTXOs() {
 		return this._compoundUTXOs();
 	}
-	_compoundUTXOs(delay=500, errorAlert=true){
+	_compoundUTXOs(delay = 500, errorAlert = true) {
 		const uid = UID();
-		this.addPreparingTransactionNotification({uid, compoundUTXOs:true})
-		return new Promise((resolve)=>{
-			dpc(delay, async()=>{
+		this.addPreparingTransactionNotification({ uid, compoundUTXOs: true })
+		return new Promise((resolve) => {
+			dpc(delay, async () => {
 				let useLatestChangeAddress = !!this.useLatestAddressForCompound;
-				console.log("useLatestChangeAddress:"+useLatestChangeAddress)
-				let response = await this.wallet.compoundUTXOs({useLatestChangeAddress})
-				.catch(err=>{
-					console.log("compoundUTXOs error", err, errorAlert)
-					let error = err.error || err.message || i18n.t('Could not compound transactions. Please Retry later.');
-					if(errorAlert && !error.includes("Amount is expected")){		
-						FlowDialog.alert(
-							i18n.t('Error'),
-							html`${error}${this.buildDebugInfoForDialog(err)}`
-						)
-					}
-				})
-				if(response)
+				console.log("useLatestChangeAddress:" + useLatestChangeAddress)
+				let response = await this.wallet.compoundUTXOs({ useLatestChangeAddress })
+					.catch(err => {
+						console.log("compoundUTXOs error", err, errorAlert)
+						let error = err.error || err.message || i18n.t('Could not compound transactions. Please Retry later.');
+						if (errorAlert && !error.includes("Amount is expected")) {
+							FlowDialog.alert(
+								i18n.t('Error'),
+								html`${error}${this.buildDebugInfoForDialog(err)}`
+							)
+						}
+					})
+				if (response)
 					console.log("compoundUTXOs response", response)
 
-				this.removePreparingTransactionNotification({uid});
+				this.removePreparingTransactionNotification({ uid });
 
 				resolve()
 			})
 		})
 	}
 
-	async showUTXOs(){
-		if(this.utxosSyncStarted){
+	async showUTXOs() {
+		if (this.utxosSyncStarted) {
 			this.selectTab("utxos");
 			return
 		}
 		this.hideUTXOs = false;
 		this.requestUpdate("hideUTXOs", true);
-		dpc(500, async()=>{
+		dpc(500, async () => {
 			this.selectTab("utxos");
 			this.utxosSyncStarted = true
-			this.wallet.on("utxo-sync", ({utxos})=>{
-				utxos.forEach(tx=>{
+			this.wallet.on("utxo-sync", ({ utxos }) => {
+				utxos.forEach(tx => {
 					this.utxos.set(tx.id, tx);
 				})
 				this.requestUpdate("utxos", null);
@@ -828,34 +827,34 @@ export class KaspaWalletUI extends BaseElement{
 		})
 	}
 
-	reloadUTXOs(){
+	reloadUTXOs() {
 		this.reloadingUTXOs = true;
 		this.utxos.clear();
 		this.wallet.startUTXOsPolling();
-		dpc(5000, ()=>{
+		dpc(5000, () => {
 			this.reloadingUTXOs = false;
 		})
 	}
 
-	async scanMoreAddresses(){
-		let {receiveEnd=-1, changeEnd=-1} = this._lastScan||{}
-		dpc(500, async()=>{
+	async scanMoreAddresses() {
+		let { receiveEnd = -1, changeEnd = -1 } = this._lastScan || {}
+		dpc(500, async () => {
 			let response = await this.wallet.scanMoreAddresses(10000, false, receiveEnd, changeEnd)
-			.catch(err=>{
-				console.log("scanMoreAddresses error", err)
-				let error = err.error || err.message || i18n.t('Could not scan more addresses. Please Retry later.');
-				if(typeof error == 'string')
-					FlowDialog.alert(i18n.t('Error'), error)
-			})
-			if(response){
+				.catch(err => {
+					console.log("scanMoreAddresses error", err)
+					let error = err.error || err.message || i18n.t('Could not scan more addresses. Please Retry later.');
+					if (typeof error == 'string')
+						FlowDialog.alert(i18n.t('Error'), error)
+				})
+			if (response) {
 				console.log("scanMoreAddresses response", response)
-				let {receive, change} =  response;
-				this._lastScan = this._lastScan||{};
-				if (receive.end){
-					this._lastScan.receiveEnd = receive.end-1;
+				let { receive, change } = response;
+				this._lastScan = this._lastScan || {};
+				if (receive.end) {
+					this._lastScan.receiveEnd = receive.end - 1;
 				}
-				if (change.end){
-					this._lastScan.changeEnd = change.end-1;
+				if (change.end) {
+					this._lastScan.changeEnd = change.end - 1;
 				}
 			}
 		})
@@ -863,22 +862,22 @@ export class KaspaWalletUI extends BaseElement{
 
 
 
-	getWalletInfo(wallet){
+	getWalletInfo(wallet) {
 		this.wallet = wallet;
-		return new Promise((resolve, reject)=>{
-	    	//this.uid = getUniqueId(await wallet.mnemonic);
-		    wallet.on("ready", (args)=>{
-		    	this.onWalletReady(args)
-		    })
-		    wallet.on('api-connect', ()=>{
+		return new Promise((resolve, reject) => {
+			//this.uid = getUniqueId(await wallet.mnemonic);
+			wallet.on("ready", (args) => {
+				this.onWalletReady(args)
+			})
+			wallet.on('api-connect', () => {
 				this.isOnline = true;
-		    	this.refreshStats();
-		    })
-		    wallet.on('api-disconnect', ()=>{
-		    	this.isOnline = false;
-		    	this.refreshStats();
-		    })
-		    wallet.on("blue-score-changed", (e)=>{
+				this.refreshStats();
+			})
+			wallet.on('api-disconnect', () => {
+				this.isOnline = false;
+				this.refreshStats();
+			})
+			wallet.on("blue-score-changed", (e) => {
 				this.blueScore = e.blueScore;
 				this.isOnline = true;
 				this.refreshStats();
@@ -906,105 +905,105 @@ export class KaspaWalletUI extends BaseElement{
 				else this.status_eta = null;
 				*/
 
-		    });
-		    wallet.on("balance-update", ({confirmedUtxosCount})=>{
-		    	this.requestUpdate("balance", null);
+			});
+			wallet.on("balance-update", ({ confirmedUtxosCount }) => {
+				this.requestUpdate("balance", null);
 				//console.log("balance-update: confirmedUtxosCount: "+confirmedUtxosCount)
-				if (this.autoCompound){
+				if (this.autoCompound) {
 					this.compoundIfNeeded(confirmedUtxosCount);
 				}
-		    })
-		    wallet.on("debug-info", ({debugInfo})=>{
-		    	this.walletDebugInfo = {...this.walletDebugInfo, ...debugInfo}
-		    	this.requestUpdate("walletDebugInfo", null);
-		    })
-			wallet.on("state-update", ({cache})=>{
+			})
+			wallet.on("debug-info", ({ debugInfo }) => {
+				this.walletDebugInfo = { ...this.walletDebugInfo, ...debugInfo }
+				this.requestUpdate("walletDebugInfo", null);
+			})
+			wallet.on("state-update", ({ cache }) => {
 				console.log("state-update", cache)
 				saveCacheToStorage(cache);
 			})
-			wallet.on("moved-transaction", (tx)=>{
-				let item = this.txs.find(t=>t.id==tx.id)
-				if(item){
+			wallet.on("moved-transaction", (tx) => {
+				let item = this.txs.find(t => t.id == tx.id)
+				if (item) {
 					item.isMoved = true;
 					this.requestUpdate("balance", null);
 				}
 			})
-			wallet.on("update-transactions", (list)=>{
-		    	//console.log("############ update-transaction", list)
-				list.forEach(tx=>{
-					if (tx.ts){
+			wallet.on("update-transactions", (list) => {
+				//console.log("############ update-transaction", list)
+				list.forEach(tx => {
+					if (tx.ts) {
 						tx.date = GetTS(new Date(tx.ts));
 					}
-					let tx_old = this.txs.find(t=>t.id == tx.id);
-					if (tx_old){
+					let tx_old = this.txs.find(t => t.id == tx.id);
+					if (tx_old) {
 						Object.assign(tx_old, tx);
 					}
 				});
 			})
 
-			wallet.on("transactions-update-status", (info)=>{
-		    	//console.log("############ transactions-update-status", info.status)
-				if (info.status=="finished"){
+			wallet.on("transactions-update-status", (info) => {
+				//console.log("############ transactions-update-status", info.status)
+				if (info.status == "finished") {
 					this.updatingTransactionsTime = false;
 				}
-				if (info.total != undefined){
+				if (info.total != undefined) {
 					this.updatingTransactionsTimeStatus = Object.assign(
-						this.updatingTransactionsTimeStatus||{},
+						this.updatingTransactionsTimeStatus || {},
 						info
 					);
 				}
 				this.requestUpdate("updatingTransactionsTimeStatus", null)
 			})
-		    wallet.on("new-transaction", (tx)=>{
-		    	//console.log("############ new-transaction", tx)
-		    	tx.date = GetTS(new Date(tx.ts));
-		    	this.txs.unshift(tx);
-		    	this.txs = this.txs.slice(0, 10000);
-		    	this.requestUpdate("balance", null);
-		    	if(this.txDialog)
-		    		this.txDialog.onNewTx(tx)
-		    })
-		    wallet.on("transactions", (list)=>{
-		    	//console.log("############ transactions", list.length)
-		    	list.forEach(tx=>{
-			    	tx.date = GetTS(new Date(tx.ts));
-			    	let index = this.findTxIndex(tx);
-			    	this.txs.splice(index, 0, tx);
-			    })
-		    })
-		    wallet.on("new-address", (detail)=>{
-		    	let {receive, change} = detail;
-		    	this.receiveAddress = receive;
-		    	this.changeAddress = change;
-		    })
+			wallet.on("new-transaction", (tx) => {
+				//console.log("############ new-transaction", tx)
+				tx.date = GetTS(new Date(tx.ts));
+				this.txs.unshift(tx);
+				this.txs = this.txs.slice(0, 10000);
+				this.requestUpdate("balance", null);
+				if (this.txDialog)
+					this.txDialog.onNewTx(tx)
+			})
+			wallet.on("transactions", (list) => {
+				//console.log("############ transactions", list.length)
+				list.forEach(tx => {
+					tx.date = GetTS(new Date(tx.ts));
+					let index = this.findTxIndex(tx);
+					this.txs.splice(index, 0, tx);
+				})
+			})
+			wallet.on("new-address", (detail) => {
+				let { receive, change } = detail;
+				this.receiveAddress = receive;
+				this.changeAddress = change;
+			})
 
-		    wallet.on("grpc-flags", (flags)=>{
-		    	console.log("grpc-flags", flags)
+			wallet.on("grpc-flags", (flags) => {
+				console.log("grpc-flags", flags)
 				//console.log("grpc-flags:skipUTXOIndexCheck", this.skipUTXOIndexCheck)
-		    	this.grpcFlags = flags;
-		    	this.UTXOIndexSupport = !!flags.utxoIndex;
-		    	if(!this.skipUTXOIndexCheck && !this.UTXOIndexSupport){
-		    		this.alertUTXOIndexSupportIssue()
-		    	}
-		    	resolve();
-		    })
+				this.grpcFlags = flags;
+				this.UTXOIndexSupport = !!flags.utxoIndex;
+				if (!this.skipUTXOIndexCheck && !this.UTXOIndexSupport) {
+					this.alertUTXOIndexSupportIssue()
+				}
+				resolve();
+			})
 
-			wallet.on("scan-more-addresses-started", ({receiveStart, changeStart})=>{
+			wallet.on("scan-more-addresses-started", ({ receiveStart, changeStart }) => {
 				console.log("scan-more-addresses-started: receiveStart, changeStart", receiveStart, changeStart)
 				this.extraScanning = {
-					status:"started",
-					error:null,
+					status: "started",
+					error: null,
 					receiveStart,
 					changeStart,
-					receiveFinal:"",
-					changeFinal:""
+					receiveFinal: "",
+					changeFinal: ""
 				};
 				this.requestUpdate("extraScanning", null);
 			})
 
-			wallet.on("scan-more-addresses-ended", ({error, receiveFinal, changeFinal})=>{
+			wallet.on("scan-more-addresses-ended", ({ error, receiveFinal, changeFinal }) => {
 				Object.assign(this.extraScanning, {
-					status:"ended",
+					status: "ended",
 					error,
 					receiveFinal,
 					changeFinal
@@ -1012,19 +1011,19 @@ export class KaspaWalletUI extends BaseElement{
 				this.requestUpdate("extraScanning", null);
 			})
 
-			wallet.on("sync-progress", ({start, end, addressType})=>{
-				if (this.extraScanning?.status == "started"){
-					this.extraScanning[addressType+'Progress'] = end;
+			wallet.on("sync-progress", ({ start, end, addressType }) => {
+				if (this.extraScanning?.status == "started") {
+					this.extraScanning[addressType + 'Progress'] = end;
 					this.requestUpdate("extraScanning", null);
 				}
 			})
 
-		    wallet.checkGRPCFlags();
+			wallet.checkGRPCFlags();
 		})
 	}
 
-	renderExtraScaning(){
-		if (!this.extraScanning){
+	renderExtraScaning() {
+		if (!this.extraScanning) {
 			return ''
 		}
 		let {
@@ -1044,7 +1043,7 @@ export class KaspaWalletUI extends BaseElement{
 			changeProgress = '';
 
 		return html`<div class="caption">${T(`Scanning ${status}`)}</div>
-		${error?html`<div class="error">Error: ${error}</div>`:''}
+		${error ? html`<div class="error">Error: ${error}</div>` : ''}
 		<div class="info-table">
 			<div>
 				<div is="i18n-div">Address</div>
@@ -1055,50 +1054,50 @@ export class KaspaWalletUI extends BaseElement{
 			<div>
 				<div is="i18n-div">Receive</div>
 				<div>${receiveStart}</div>
-				<div>${receiveProgress||''}</div>
-				<div>${receiveFinal||''}</div>
+				<div>${receiveProgress || ''}</div>
+				<div>${receiveFinal || ''}</div>
 			</div>
 			<div>
 				<div is="i18n-div">Change</div>
 				<div>${changeStart}</div>
-				<div>${changeProgress||''}</div>
-				<div>${changeFinal||''}</div>
+				<div>${changeProgress || ''}</div>
+				<div>${changeFinal || ''}</div>
 			</div>
 		</div>
 		`
 	}
 
-	async alertUTXOIndexSupportIssue(){
+	async alertUTXOIndexSupportIssue() {
 		let title = html`<fa-icon class="big warning" 
 			icon="exclamation-triangle"></fa-icon> ${T('Attention !')}`;
 
 		let body = html`${i18nHTMLFormat(`'utxoindex' flag is missing from KASPAD config.<br />
 			Please inform the wallet administrator.<br />`)}
 		`
-		let {btn} = await FlowDialog.alert({
-			title, body, cls:'with-icon big warning'
+		let { btn } = await FlowDialog.alert({
+			title, body, cls: 'with-icon big warning'
 		})
 		//if(btn != 'next')
 		//	return
 	}
 
-	findTxIndex(transaction){
-		let index = this.txs.findIndex(tx=>tx.ts<transaction.ts);
-		if(index<0){
-			return this.txs.length+100;
+	findTxIndex(transaction) {
+		let index = this.txs.findIndex(tx => tx.ts < transaction.ts);
+		if (index < 0) {
+			return this.txs.length + 100;
 		}
 		return index
 	}
 	async loadData() {
-		let dots = setInterval(()=>{
+		let dots = setInterval(() => {
 			this.dots += '.';
-			if(this.dots.length > 5)
+			if (this.dots.length > 5)
 				this.dots = '.';
 		}, 333);
 		try {
 			this.isLoading = true;
 			let cache = await getCacheFromStorage()
-			if(cache){
+			if (cache) {
 				this.wallet.restoreCache(cache);
 			}
 			/*if (this._isCache) {
@@ -1106,11 +1105,11 @@ export class KaspaWalletUI extends BaseElement{
 				await this.refreshState();
 				this.isLoading = false;
 			}else{*/
-				this.log("calling loadData-> wallet.addressDiscovery")
-				//if(this.grpcFlags.utxoIndex)
-					await this.wallet.sync();
-				//this.saveCache();
-				this.isLoading = false;
+			this.log("calling loadData-> wallet.addressDiscovery")
+			//if(this.grpcFlags.utxoIndex)
+			await this.wallet.sync();
+			//this.saveCache();
+			this.isLoading = false;
 			/*}*/
 		} catch (err) {
 			this.isLoading = false;
@@ -1119,15 +1118,15 @@ export class KaspaWalletUI extends BaseElement{
 		clearInterval(dots);
 		this.updateFaucetBalance();
 	}
-	connectedCallback(){
+	connectedCallback() {
 		super.connectedCallback();
-		let mobileSuffix = isMobile?'-mobile':'';
+		let mobileSuffix = isMobile ? '-mobile' : '';
 		let openDialog = document.createElement('kaspa-open-dialog');
 		openDialog.hideLogo = !!this.hideOpenWalletLogo;
 		this.parentNode.insertBefore(openDialog, this.nextSibling)
-		this.sendDialog = document.createElement("kaspa-send-dialog"+mobileSuffix);
+		this.sendDialog = document.createElement("kaspa-send-dialog" + mobileSuffix);
 		this.parentNode.appendChild(this.sendDialog);
-		this.receiveDialog = document.createElement("kaspa-receive-dialog"+mobileSuffix);
+		this.receiveDialog = document.createElement("kaspa-receive-dialog" + mobileSuffix);
 		this.parentNode.appendChild(this.receiveDialog);
 		this.seedsDialog = document.createElement("kaspa-seeds-dialog");
 		this.parentNode.appendChild(this.seedsDialog);
@@ -1139,38 +1138,38 @@ export class KaspaWalletUI extends BaseElement{
 		let uploadFileDialog = document.createElement("kaspa-upload-file-dialog");
 		this.parentNode.appendChild(uploadFileDialog);
 
-		const {workerCorePath} = window.KaspaConfig||{}
+		const { workerCorePath } = window.KaspaConfig || {}
 		initKaspaFramework({
-			workerPath: workerCorePath||"/kaspa-wallet-worker/worker.js?ident="+(window.KaspaConfig?.ident||"")
-		}).then(()=>{
+			workerPath: workerCorePath || "/kaspa-wallet-worker/worker.js?ident=" + (window.KaspaConfig?.ident || "")
+		}).then(() => {
 			let encryptedMnemonic = getLocalWallet()?.mnemonic;
 			this.initWallet(encryptedMnemonic)
 		})
 	}
-	
-	initWallet(encryptedMnemonic){
-		if(encryptedMnemonic){
+
+	initWallet(encryptedMnemonic) {
+		if (encryptedMnemonic) {
 			showWalletInitDialog({
-				mode:"open",
-				wallet:this,
-				hideable:false
-			}, (err, info)=>{
+				mode: "open",
+				wallet: this,
+				hideable: false
+			}, (err, info) => {
 				info.encryptedMnemonic = encryptedMnemonic;
 				this.handleInitDialogCallback(info)
 			})
-		}else{
+		} else {
 			showWalletInitDialog({
-				mode:"init",
-				wallet:this,
-				hideable:false,
-				isFresh:true
-			}, (err, info)=>{
+				mode: "init",
+				wallet: this,
+				hideable: false,
+				isFresh: true
+			}, (err, info) => {
 				//console.log("showWalletInitDialog:result", info)
 				this.handleInitDialogCallback(info)
 			})
 		}
 	}
-	async handleInitDialogCallback({dialog, password, seedPhrase, encryptedMnemonic}){
+	async handleInitDialogCallback({ dialog, password, seedPhrase, encryptedMnemonic }) {
 		console.log("$$$$$$$ INIT NETWORK SETTINGS - START");
 		await this.initNetworkSettings();
 		console.log("$$$$$$$ INIT NETWORK SETTINGS - DONE");
@@ -1178,22 +1177,22 @@ export class KaspaWalletUI extends BaseElement{
 		const { network, rpc } = this;
 		console.log("$$$$$$$ INIT NETWORK SETTINGS", { network, rpc });
 
-		if(!rpc)
+		if (!rpc)
 			return FlowDialog.alert(i18n.t("Error"), i18n.t("Kaspa Daemon config is missing."));
 
 		this.initDaemonRPC();
 		this.initHelpers();
 
-		let {mode} = dialog;
+		let { mode } = dialog;
 		//console.log("$$$$$$$ mode", mode, encryptedMnemonic)
-		if(mode =="open"){
-			const wallet = await Wallet.import(password, encryptedMnemonic, {network, rpc})
-			.catch(error=>{
-				console.log("import wallet error:", error)
-				dialog.setError(i18n.t("Incorrect password."));
-			});
+		if (mode == "open") {
+			const wallet = await Wallet.import(password, encryptedMnemonic, { network, rpc })
+				.catch(error => {
+					console.log("import wallet error:", error)
+					dialog.setError(i18n.t("Incorrect password."));
+				});
 
-			if(!wallet)
+			if (!wallet)
 				return
 
 			dialog.hide();
@@ -1201,16 +1200,16 @@ export class KaspaWalletUI extends BaseElement{
 			this.setWallet(wallet);
 			return
 		}
-		if(mode == "import"){
-			const wallet = await Wallet.import(password, encryptedMnemonic, {network, rpc})
-			.catch(error=>{
-				console.log("import wallet error:", error)
-				dialog.setError(i18n.t("Incorrect password."));
-			});
+		if (mode == "import") {
+			const wallet = await Wallet.import(password, encryptedMnemonic, { network, rpc })
+				.catch(error => {
+					console.log("import wallet error:", error)
+					dialog.setError(i18n.t("Incorrect password."));
+				});
 
 			//console.log("Wallet imported", encryptedMnemonic)
 
-			if(!wallet)
+			if (!wallet)
 				return
 
 			encryptedMnemonic = await wallet.export(password);
@@ -1218,12 +1217,12 @@ export class KaspaWalletUI extends BaseElement{
 			this.setWallet(wallet);
 			return
 		}
-		if(mode == "create"){
+		if (mode == "create") {
 			dialog.hide();
-			const wallet = new Wallet(null,null, {network,rpc});
+			const wallet = new Wallet(null, null, { network, rpc });
 			const mnemonic = await wallet.mnemonic;
-			this.openSeedsDialog({mnemonic, hideable:false}, async({finished})=>{
-				if(!finished)
+			this.openSeedsDialog({ mnemonic, hideable: false }, async ({ finished }) => {
+				if (!finished)
 					return
 
 				encryptedMnemonic = await wallet.export(password);
@@ -1233,19 +1232,19 @@ export class KaspaWalletUI extends BaseElement{
 			return
 		}
 
-		if(mode == "recover"){
+		if (mode == "recover") {
 			const { network, rpc } = this;
 
 			//console.log("recover:Wallet:seedPhrase, password", seedPhrase, password)
 			let wallet;
-			try{
+			try {
 				wallet = Wallet.fromMnemonic(seedPhrase, { network, rpc });
-			}catch(error){
+			} catch (error) {
 				console.log("recover:Wallet.fromMnemonic error", error)
-				dialog.setError(i18n.t("Invalid seed")+` (${error.message})`);
+				dialog.setError(i18n.t("Invalid seed") + ` (${error.message})`);
 			}
 
-			if(!wallet)
+			if (!wallet)
 				return
 			const encryptedMnemonic = await wallet.export(password);
 			setLocalWallet(encryptedMnemonic, this.walletMeta);
@@ -1254,38 +1253,38 @@ export class KaspaWalletUI extends BaseElement{
 			return
 		}
 	}
-	showSeedRecoveryDialog(){
+	showSeedRecoveryDialog() {
 		let encryptedMnemonic = getLocalWallet().mnemonic;
-		this.openSeedsDialog({encryptedMnemonic, step:1}, ({finished})=>{
-			if(finished){
+		this.openSeedsDialog({ encryptedMnemonic, step: 1 }, ({ finished }) => {
+			if (finished) {
 				this.requestUpdate("have-backup", null)
 			}
 		})
 	}
-	openSeedsDialog(args, callback){
+	openSeedsDialog(args, callback) {
 		this.seedsDialog.open(args, callback)
 	}
-	showTxDialog(){
-		if(!this.txDialog){
+	showTxDialog() {
+		if (!this.txDialog) {
 			this.txDialog = document.createElement("kaspa-tx-dialog");
 			this.parentNode.appendChild(this.txDialog);
 		}
-		this.txDialog.open({wallet:this}, (args)=>{})
+		this.txDialog.open({ wallet: this }, (args) => { })
 	}
-	showSendDialog(){
-		this.sendDialog.open({wallet:this}, (args)=>{
+	showSendDialog() {
+		this.sendDialog.open({ wallet: this }, (args) => {
 			this.sendTx(args);
 		})
 	}
-	showReceiveDialog(){
+	showReceiveDialog() {
 		let address = this.receiveAddress;
-		this.receiveDialog.open({address}, (args)=>{
+		this.receiveDialog.open({ address }, (args) => {
 		})
 	}
 
-	async isValidAddress(address){
+	async isValidAddress(address) {
 		let [prefix] = address.split(":");
-		if(window.mobileMode && prefix=="kaspatest")
+		if (window.mobileMode && prefix == "kaspatest")
 			return true;
 
 		let minningAddress = await this.getMiningAddress()
@@ -1293,20 +1292,20 @@ export class KaspaWalletUI extends BaseElement{
 		return prefix == prefix2;
 	}
 
-	async getMiningAddress(){
+	async getMiningAddress() {
 		await this.walletSignal
-		if(this.receiveAddress)
+		if (this.receiveAddress)
 			return Promise.resolve(this.receiveAddress);
 
 		return this.wallet.receiveAddress;
 	}
 
-	addPreparingTransactionNotification(args){
+	addPreparingTransactionNotification(args) {
 		this.preparingTxNotifications.set(args.uid, args);
 		this.requestUpdate("preparingTxNotifications")
 	}
 
-	removePreparingTransactionNotification({uid}){
+	removePreparingTransactionNotification({ uid }) {
 		this.preparingTxNotifications.delete(uid);
 		this.requestUpdate("preparingTxNotifications")
 	}
@@ -1319,42 +1318,42 @@ export class KaspaWalletUI extends BaseElement{
 	}
 	*/
 
-	async sendTx(args){
+	async sendTx(args) {
 		const {
 			address, amount, note, fee,
 			calculateNetworkFee, inclusiveFee
 		} = args;
 		console.log("sendTx:args", args)
 		let uid;
-		if(amount > 10){
+		if (amount > 10) {
 			uid = UID();
-			this.addPreparingTransactionNotification({uid, amount, address, note})
+			this.addPreparingTransactionNotification({ uid, amount, address, note })
 		}
 		const response = await this.wallet.submitTransaction({
 			toAddr: address,
 			amount,
 			fee, calculateNetworkFee, inclusiveFee, note
-		}).catch(err=>{
+		}).catch(err => {
 			let msg = err.error || err.message || err;
-			let error = (msg+"").replace("Error:", '')
+			let error = (msg + "").replace("Error:", '')
 			console.log("error", error)
-			if(/Invalid Argument/.test(error))
+			if (/Invalid Argument/.test(error))
 				error = i18n.t("Please provide correct address and amount");
-			uid && this.removePreparingTransactionNotification({uid});
+			uid && this.removePreparingTransactionNotification({ uid });
 			FlowDialog.alert("Error", html`${error}${this.buildDebugInfoForDialog(err)}`);
 		})
 
-		if(uid){
+		if (uid) {
 			//if(response?.txid)
 			//	this.updatePreparingTransactionNotification({uid, txid:response.txid});
 			//else
-				this.removePreparingTransactionNotification({uid});
+			this.removePreparingTransactionNotification({ uid });
 		}
 
 		console.log("sendTx: response", response)
 	}
 
-	async estimateTx(args){
+	async estimateTx(args) {
 		const {
 			address, amount, note, fee,
 			calculateNetworkFee, inclusiveFee
@@ -1366,64 +1365,64 @@ export class KaspaWalletUI extends BaseElement{
 			toAddr: address,
 			amount,
 			fee, calculateNetworkFee, inclusiveFee, note
-		}).catch(err=>{
+		}).catch(err => {
 			let msg = err.error || err.message || err;
-			error = (msg+"").replace("Error:", '');
-			if(/Invalid Argument/.test(error))
+			error = (msg + "").replace("Error:", '');
+			if (/Invalid Argument/.test(error))
 				error = i18n.t("Please provide address and amount");
 			console.log("error", err);
 			//error = 'Unable to estimate transaction fees';//(err+"").replace("Error:", '')
 		})
 
-		let result = {data, error}
+		let result = { data, error }
 		console.log("estimateTx:", data, error);
 
 		return result;
 	}
 
 
-	makeFaucetRequest(subject, args){
-		if(!window.flow?.app?.rpc?.request)
+	makeFaucetRequest(subject, args) {
+		if (!window.flow?.app?.rpc?.request)
 			return Promise.reject("flow.app.rpc issue")
 		return flow.app.rpc.request(subject, args)
 	}
 
 	async updateFaucetBalance() {
-		this.makeFaucetRequest('faucet-available', {address : this.receiveAddress})
-		.then((resp) => {
-			console.log(resp);
-			const { available, period, ip } = resp;
-			this.faucetStatus = null;
-			this.faucetFundsAvailable = available;
-			this.faucetPeriod = period;
-			this.ip = ip;
+		this.makeFaucetRequest('faucet-available', { address: this.receiveAddress })
+			.then((resp) => {
+				console.log(resp);
+				const { available, period, ip } = resp;
+				this.faucetStatus = null;
+				this.faucetFundsAvailable = available;
+				this.faucetPeriod = period;
+				this.ip = ip;
 
-		})
-		.catch(ex => {
-			console.log('faucet error:', ex);
-		})
+			})
+			.catch(ex => {
+				console.log('faucet error:', ex);
+			})
 	}
 
 	async getKaspaFromFaucet(amount) {
 		this.makeFaucetRequest('faucet-request', {
-			address : this.receiveAddress,
+			address: this.receiveAddress,
 			amount: formatForMachine(amount)
 		})
-		.then((resp) => {
-			console.log(resp);
-			const { available, period, ip } = resp;
-			this.faucetStatus = null;
-			this.faucetFundsAvailable = available;
-			this.faucetPeriod = period;
-			this.ip = ip;
+			.then((resp) => {
+				console.log(resp);
+				const { available, period, ip } = resp;
+				this.faucetStatus = null;
+				this.faucetFundsAvailable = available;
+				this.faucetPeriod = period;
+				this.ip = ip;
 
-		})
-		.catch(ex => {
-			console.log('faucet error:', ex);
-		})
+			})
+			.catch(ex => {
+				console.log('faucet error:', ex);
+			})
 	}
 
-	clearUsedUTXOs(){
+	clearUsedUTXOs() {
 		this.wallet.clearUsedUTXOs();
 	}
 
@@ -1431,18 +1430,18 @@ export class KaspaWalletUI extends BaseElement{
 	requestFaucetFunds() {
 		let max = formatForHuman(this.faucetFundsAvailable)
 		showT9({
-			value:'',
+			value: '',
 			max,
-			heading:i18n.t('Request funds'),
-			inputLabel:i18n.t('Amount in KAS')
-		}, ({value:amount, dialog})=>{
-			let sompis = formatForMachine(amount||0);
-			if(sompis > this.faucetFundsAvailable){
+			heading: i18n.t('Request funds'),
+			inputLabel: i18n.t('Amount in KAS')
+		}, ({ value: amount, dialog }) => {
+			let sompis = formatForMachine(amount || 0);
+			if (sompis > this.faucetFundsAvailable) {
 				let msg = i18n.t(`You can't request more than [n] KAS.`)
-						.replace("[n]", KAS(this.faucetFundsAvailable||0))
+					.replace("[n]", KAS(this.faucetFundsAvailable || 0))
 				return dialog.setError(msg);//'
 			}
-			
+
 			dialog.hide();
 
 			this.getKaspaFromFaucet(amount)
@@ -1450,28 +1449,28 @@ export class KaspaWalletUI extends BaseElement{
 		})
 	}
 
-	showQRScanner(args, callback){
-		args = args||{};
+	showQRScanner(args, callback) {
+		args = args || {};
 		args.wallet = this;
-		showQRScanner(args, ({value, dialog})=>{
+		showQRScanner(args, ({ value, dialog }) => {
 			console.log("SCAN result", value)
 			dialog.hide();
-			if(!value)
+			if (!value)
 				return
-			let [address, searchQuery=''] = value.split("?");
+			let [address, searchQuery = ''] = value.split("?");
 			let searchParams = new URLSearchParams(searchQuery)
 			let args = Object.fromEntries(searchParams.entries());
-			let {amount} = args;
-			callback({address, amount})
+			let { amount } = args;
+			callback({ address, amount })
 		})
 	}
 
 	showSendDialogWithQrScanner() {
-		this.showQRScanner({isAddressQuery:true}, ({amount, address})=>{
-			if(!address)
+		this.showQRScanner({ isAddressQuery: true }, ({ amount, address }) => {
+			if (!address)
 				return
-			dpc(100, ()=>{
-				this.sendDialog.open({wallet:this, amount, address}, (args)=>{
+			dpc(100, () => {
+				this.sendDialog.open({ wallet: this, amount, address }, (args) => {
 					this.sendTx(args);
 				})
 			})
@@ -1479,7 +1478,7 @@ export class KaspaWalletUI extends BaseElement{
 	}
 
 	getTimeDelta(ts) {
-		if(!ts)
+		if (!ts)
 			return '00:00:00';
 		let delta = Math.round(ts / 1000);
 		let sec = (delta % 60);
@@ -1487,12 +1486,12 @@ export class KaspaWalletUI extends BaseElement{
 		let hrs = Math.floor(delta / 60 / 60 % 24);
 		let days = Math.floor(delta / 60 / 60 / 24);
 
-		sec = (sec<10?'0':'')+sec;
-		min = (min<10?'0':'')+min;
-		hrs = (hrs<10?'0':'')+hrs;
+		sec = (sec < 10 ? '0' : '') + sec;
+		min = (min < 10 ? '0' : '') + min;
+		hrs = (hrs < 10 ? '0' : '') + hrs;
 
-		if(days && days >= 1) {
-			return `${days.toFixed(0)} day${days>1?'s':''} ${hrs}:${min}:${sec}`;
+		if (days && days >= 1) {
+			return `${days.toFixed(0)} day${days > 1 ? 's' : ''} ${hrs}:${min}:${sec}`;
 		} else {
 			return `${hrs}:${min}:${sec}`;
 		}

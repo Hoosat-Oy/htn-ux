@@ -2,17 +2,17 @@ import {
 	html, css, KaspaDialog, askForPassword, KAS,
 	formatForMachine, T, i18n, formatForHuman, getLocalWallet
 } from './kaspa-dialog.js';
-import {Wallet} from '@kaspa/wallet-worker';
+import { Wallet } from '@kaspa/wallet-worker';
 const pass = "";
 
-class KaspaSendDialogMobile extends KaspaDialog{
-	static get properties(){
+class KaspaSendDialogMobile extends KaspaDialog {
+	static get properties() {
 		return {
-			address:{type:String}
+			address: { type: String }
 		}
 	}
-	static get styles(){
-		return [KaspaDialog.styles, 
+	static get styles() {
+		return [KaspaDialog.styles,
 		css`
 			.container{
 				border-radius:0px;width:100%;height:100%;border:0px;
@@ -52,18 +52,18 @@ class KaspaSendDialogMobile extends KaspaDialog{
 			}
 		`]
 	}
-	buildRenderArgs(){
+	buildRenderArgs() {
 		const estimating = this.estimateTxSignal && !this.estimateTxSignal.isResolved;
 		const estimateFee = this.estimate?.fee;
-		return {estimating, estimateFee};
+		return { estimating, estimateFee };
 	}
-	renderHeading({estimating}){
+	renderHeading({ estimating }) {
 		return html`${this.renderBackBtn()} SEND 
 			<div class="flex"></div>
-			${estimating?html`<fa-icon class="spinner" icon="sync"
-				></fa-icon>`:''}`;
+			${estimating ? html`<fa-icon class="spinner" icon="sync"
+				></fa-icon>`: ''}`;
 	}
-	renderBody({estimating, estimateFee}){
+	renderBody({ estimating, estimateFee }) {
 		return html`
 			<center>
 				<label is="i18n-label">Enter recipient address</label>
@@ -102,9 +102,9 @@ class KaspaSendDialogMobile extends KaspaDialog{
 			</flow-btn>
 			`;
 	}
-	renderAddress(){
+	renderAddress() {
 		let address = this.address;
-		return html `
+		return html`
 			<flow-input class="address full-width" clear-btn outer-border
 				label="${T('Address')}" _readonly placeholder=""
 				value="${address}"
@@ -112,54 +112,54 @@ class KaspaSendDialogMobile extends KaspaDialog{
 			</flow-input>
 		`
 	}
-	
-	renderEstimate(){
-		if(this.estimateError)
+
+	renderEstimate() {
+		if (this.estimateError)
 			return html`<div class="estimate-tx-error">${this.estimateError}</div>`;
-		let {dataFee, fee, totalAmount, txSize} = this.estimate||{}
+		let { dataFee, fee, totalAmount, txSize } = this.estimate || {}
 
 		return html`
 		<div class="estimate-tx">
 			<table>
-				${txSize?html`<tr><td is="i18n-td">Transaction Size</td><td>${txSize.toFileSize()}</td></tr>`:''}
-				${dataFee?html`<tr><td is="i18n-td">Data Fee</td><td>${KAS(dataFee)} HTN</td></tr>`:''}
-				${fee?html`<tr><td is="i18n-td">Total Fee</td><td>${KAS(fee)} HTN</td></tr>`:''}
-				${totalAmount?html`<tr><td is="i18n-td">Total Amount</td><td> ${KAS(totalAmount)} HTN</td></tr>`:''}
+				${txSize ? html`<tr><td is="i18n-td">Transaction Size</td><td>${txSize.toFileSize()}</td></tr>` : ''}
+				${dataFee ? html`<tr><td is="i18n-td">Data Fee</td><td>${KAS(dataFee)} HTN</td></tr>` : ''}
+				${fee ? html`<tr><td is="i18n-td">Total Fee</td><td>${KAS(fee)} HTN</td></tr>` : ''}
+				${totalAmount ? html`<tr><td is="i18n-td">Total Amount</td><td> ${KAS(totalAmount)} HTN</td></tr>` : ''}
 			</table>
 		</div>
 		`
 	}
-	renderButtons(){
+	renderButtons() {
 		return ''
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
 		this.wallet = args.wallet;
 		this.estimateError = "";
 		this.estimate = {};
 		this.alertFeeAmount = 1e8;
-		this.address = args.address||"";
-		if(args.amount){
+		this.address = args.address || "";
+		if (args.amount) {
 			let amountField = this.qS(".amount");
 			amountField.value = args.amount
 		}
 		this.show();
 	}
-	cleanUpForm(){
+	cleanUpForm() {
 		this.estimateError = "";
 		this.estimate = {};
 		this.requestUpdate("estimate", null)
-		this.qSAll("flow-input").forEach(input=>{
-    		input.value = "";
+		this.qSAll("flow-input").forEach(input => {
+			input.value = "";
 		})
 		this.qS(".inclusive-fee").checked = false;
-		
+
 	}
-	scanQRCode(){
-		this.wallet.showQRScanner({isAddressQuery:true}, ({amount, address})=>{
+	scanQRCode() {
+		this.wallet.showQRScanner({ isAddressQuery: true }, ({ amount, address }) => {
 			console.log("scan result: amount, address", amount, address)
-			if(amount){
+			if (amount) {
 				let amountField = this.qS(".amount");
 				amountField.value = amount
 			}
@@ -168,86 +168,86 @@ class KaspaSendDialogMobile extends KaspaDialog{
 		})
 	}
 
-	async copyFromClipboard(){
+	async copyFromClipboard() {
 		const address = await navigator.clipboard.readText();
 		this.setAddress(address)
 	}
-	async setAddress(address){
-		if(!address){
+	async setAddress(address) {
+		if (!address) {
 			this.address = "";
 			return
 		}
 
 		[address] = address.split("?");
 		let valid = await this.wallet?.isValidAddress(address);
-		if(!valid){
+		if (!valid) {
 			this.setError("Invalid address")
 			return
 		}
 
 		this.address = address;
 	}
-	onAddressChange(e){
-		let {value} = e.detail;
-		if(!value)
+	onAddressChange(e) {
+		let { value } = e.detail;
+		if (!value)
 			this.address = value;
 
 	}
 
-	showT9(e){
+	showT9(e) {
 		let input = e.target.closest("flow-input");
-		let {value=''} = input;
+		let { value = '' } = input;
 		showT9({
 			value,
-			heading:input.label.replace("in HTN", ""),
-			inputLabel:input.label
-		}, ({value, dialog})=>{
+			heading: input.label.replace("in HTN", ""),
+			inputLabel: input.label
+		}, ({ value, dialog }) => {
 			console.log("t9 result", value)
 			input.value = value;
 			dialog.hide();
 		})
 	}
-	hide(skipHistory=false){
+	hide(skipHistory = false) {
 		this.cleanUpForm();
 		super.hide(skipHistory)
 	}
-    cancel(){
-    	this.hide();
-    }
-    getFormData(){
-    	let address = this.qS(".address").value;
-    	let amount = this.qS(".amount").value;
-    	let note = this.qS(".note").value;
-    	let fee = this.qS(".fee").value || 0;
-    	let calculateNetworkFee = !!this.qS(".calculate-network-fee").checked;
-    	let inclusiveFee = !!this.qS(".inclusive-fee").checked;
+	cancel() {
+		this.hide();
+	}
+	getFormData() {
+		let address = this.qS(".address").value;
+		let amount = this.qS(".amount").value;
+		let note = this.qS(".note").value;
+		let fee = this.qS(".fee").value || 0;
+		let calculateNetworkFee = !!this.qS(".calculate-network-fee").checked;
+		let inclusiveFee = !!this.qS(".inclusive-fee").checked;
 
-    	return {
-    		amount:formatForMachine(amount),
-    		fee:formatForMachine(fee),
-    		address, note, 
-    		calculateNetworkFee,
-    		inclusiveFee
-    	};
-    }
-    onNetworkFeeChange(){
-    	this.estimateTx();
-    }
-    onAmountChange(){
-    	this.estimateTx();
-    }
-    onCalculateFeeChange(){
-    	this.estimateTx();
-    }
-    onInclusiveFeeChange(){
-    	this.estimateTx();
-    }
-    
-	estimateTx(){
-		this.debounce('estimateTx', ()=>{
+		return {
+			amount: formatForMachine(amount),
+			fee: formatForMachine(fee),
+			address, note,
+			calculateNetworkFee,
+			inclusiveFee
+		};
+	}
+	onNetworkFeeChange() {
+		this.estimateTx();
+	}
+	onAmountChange() {
+		this.estimateTx();
+	}
+	onCalculateFeeChange() {
+		this.estimateTx();
+	}
+	onInclusiveFeeChange() {
+		this.estimateTx();
+	}
+
+	estimateTx() {
+		this.debounce('estimateTx', () => {
 			this.requestUpdate("estimateTx", null)
 			let p = this._estimateTx();
-			p.then(()=>{
+			p.then(() => {
 				p.isResolved = true;
 				this.requestUpdate("estimateTx", null)
 			})
@@ -256,64 +256,64 @@ class KaspaSendDialogMobile extends KaspaDialog{
 		}, 300)
 	}
 
-	async _estimateTx(){
-    	const formData = this.getFormData();
-    	if(!formData)
-    		return
+	async _estimateTx() {
+		const formData = this.getFormData();
+		if (!formData)
+			return
 
-    	console.log("formData:", formData)
-    	let {error, data:estimate} = await this.wallet.estimateTx(formData);
-    	console.log("estimateTx:error:", error, "estimate:", estimate)
-    	this.estimateError = error;
-    	if(estimate){
-    		this.estimate = estimate;
-    	}else{
-    		this.estimate = {};
-    	}
-    }
-    async sendAfterConfirming(){
-    	let estimate = this.estimate;
-    	if(!estimate)
-    		return
-    	if(estimate.fee > this.alertFeeAmount){
+		console.log("formData:", formData)
+		let { error, data: estimate } = await this.wallet.estimateTx(formData);
+		console.log("estimateTx:error:", error, "estimate:", estimate)
+		this.estimateError = error;
+		if (estimate) {
+			this.estimate = estimate;
+		} else {
+			this.estimate = {};
+		}
+	}
+	async sendAfterConfirming() {
+		let estimate = this.estimate;
+		if (!estimate)
+			return
+		if (estimate.fee > this.alertFeeAmount) {
 			let msg = i18n.t('Transaction Fee ([n] HTN) is very large.');
 			msg = msg.replace('[n]', KAS(estimate.fee));
-    		let {btn} = await FlowDialog.alert("Warning", 
-    			html`${msg}`,
-    			'',
-    			[{
-					text:i18n.t('Cancel'),
-					value:'cancel'
-				},{
-					text:i18n.t('Submit'),
-					value:'submit',
-					cls:'primary'
+			let { btn } = await FlowDialog.alert("Warning",
+				html`${msg}`,
+				'',
+				[{
+					text: i18n.t('Cancel'),
+					value: 'cancel'
+				}, {
+					text: i18n.t('Submit'),
+					value: 'submit',
+					cls: 'primary'
 				}]);
 
-    		if(btn !='submit')
-    			return
-    	}
-    	const formData = this.getFormData();
-    	if(!formData)
-    		return
-    	console.log("formData", formData)
-    	askForPassword({confirmBtnText:i18n.t("CONFIRM SEND"), pass}, async({btn, password})=>{
-    		//console.log("btn, password", btn, password)
-    		if(btn!="confirm")
-    			return
+			if (btn != 'submit')
+				return
+		}
+		const formData = this.getFormData();
+		if (!formData)
+			return
+		console.log("formData", formData)
+		askForPassword({ confirmBtnText: i18n.t("CONFIRM SEND"), pass }, async ({ btn, password }) => {
+			//console.log("btn, password", btn, password)
+			if (btn != "confirm")
+				return
 			formData.password = password;
 
 			let wallet = getLocalWallet();
-    		let encryptedMnemonic = wallet.mnemonic;
-    		let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
-    		if(!valid)
-    			return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
+			let encryptedMnemonic = wallet.mnemonic;
+			let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
+			if (!valid)
+				return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
 
 
 			this.hide();
 			this.callback(formData);
-    	})
-    }
+		})
+	}
 }
 
 KaspaSendDialogMobile.define("kaspa-send-dialog-mobile");

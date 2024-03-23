@@ -3,17 +3,17 @@ import {
 	T, i18n
 } from './kaspa-dialog.js';
 
-class KaspaSeedsDialog extends KaspaDialog{
+class KaspaSeedsDialog extends KaspaDialog {
 
 	static get properties() {
 		return {
-			step:{type:Number, reflect:true},
-			inputType:{type:String},
-			mnemonic:{type:String}
+			step: { type: Number, reflect: true },
+			inputType: { type: String },
+			mnemonic: { type: String }
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [KaspaDialog.styles, css`
 			.heading{text-align:center}
 			.container{max-height:var(--kaspa-dialog-container-max-height, 660px)}
@@ -41,48 +41,48 @@ class KaspaSeedsDialog extends KaspaDialog{
 		this.hideable = true;
 		this.step = 1;
 	}
-	open(args, callback){
-		this.step = args.step||1;
+	open(args, callback) {
+		this.step = args.step || 1;
 		this.callback = callback;
 		this.args = args;
 		this.mnemonic = args.mnemonic;
 		this.hideable = !!args.hideable
 		this.show();
 	}
-	buildRenderArgs(){
-		let {step} = this;
+	buildRenderArgs() {
+		let { step } = this;
 		let stepName = `Step${step}`;
-		return {stepName};
+		return { stepName };
 	}
-	renderHeading({stepName}){
-		return html`${this.hideable?this.renderBackBtn():''} ${T('Recovery Seed')}`;
+	renderHeading({ stepName }) {
+		return html`${this.hideable ? this.renderBackBtn() : ''} ${T('Recovery Seed')}`;
 	}
-	renderBody({stepName}){
+	renderBody({ stepName }) {
 		return this[`render${stepName}`]();
 	}
-	renderButtons({stepName}){
+	renderButtons({ stepName }) {
 		return this[`render${stepName}Buttons`]();
 	}
-	renderStep1(){
-		if(!this.mnemonic)
+	renderStep1() {
+		if (!this.mnemonic)
 			return '';
-		let {mnemonic} = this;
+		let { mnemonic } = this;
 		let words = mnemonic.split(" ");
 		const wordRows = chunks(words, 4);
 		let indexes = [];
-		while(indexes.length<3){
+		while (indexes.length < 3) {
 			let n;
-			do{
+			do {
 				n = getRandomInt(0, 11);
-			}while(indexes.includes(n));
+			} while (indexes.includes(n));
 
 			indexes.push(n);
 		}
 		this.words = words;
-		this.correctWords = indexes.map(index=>words[index]);
+		this.correctWords = indexes.map(index => words[index]);
 		this.indexes = indexes;
 		let otherWords = words;
-		this.indexes.forEach(index=>{
+		this.indexes.forEach(index => {
 			otherWords.splice(index, 1);
 		})
 		this.otherWords = shuffle(otherWords);
@@ -100,20 +100,20 @@ class KaspaSeedsDialog extends KaspaDialog{
 				Write it down and keep it safe.
 			</p>
 			<div class="words">
-				${wordRows.map((words, index)=>{
-					return html`
+				${wordRows.map((words, index) => {
+			return html`
 					<div class="row">
-						${words.map((word, i)=>{
-							return html`
+						${words.map((word, i) => {
+				return html`
 							<div class="cell">
 								<div class="word">${word}</div>
-								${index*4+i+1}
+								${index * 4 + i + 1}
 							</div>
 							`;
-						})}
+			})}
 					</div>
 					`;
-				})}
+		})}
 			</div>
 			<p class="dull-text text-center" is="i18n-p">
 				Cool fact: there are more 12-word phrase combinations than nanoseconds
@@ -121,44 +121,44 @@ class KaspaSeedsDialog extends KaspaDialog{
 			</p>	
 		`
 	}
-	renderStep2(){
+	renderStep2() {
 		let otherWords = chunks(this.otherWords, 3);
 		let words = otherWords[this.varificationStep];
 		words.push(this.correctWords[this.varificationStep])
 		words = shuffle(words);
 		let index = this.indexes[this.varificationStep];
-		let numToStr = (num)=>{
-			return num+(({"1":"st", "2":"nd", "3":"rd"})[num]||'th');
+		let numToStr = (num) => {
+			return num + (({ "1": "st", "2": "nd", "3": "rd" })[num] || 'th');
 		}
 		let msg = i18n.t(`Make sure you wrote the phrase down correctly by 
 				answering this quick checkup.`);
 		let subMsg = '';
-		if(this.varificationStepAnswered == 'error'){
+		if (this.varificationStepAnswered == 'error') {
 			msg = i18n.t('Wrong. Retry or go back');
-		}else if(this.varificationStep>0){
-			if(this.varificationStep==1){
+		} else if (this.varificationStep > 0) {
+			if (this.varificationStep == 1) {
 				msg = i18n.t('Good job! Two more checks to go');
 				subMsg = i18n.t(`Be wary and cautious of your secret phrase.
 						Never reveal it to anyone.`)
 			}
-			else{
+			else {
 				msg = i18n.t('Awesome, one more to go!');
 				subMsg = i18n.t(`It is recommended to keep several copies of your secret
 						seed hidden away in different places.`)
 			}
 		}
-		let numStr = i18n.t(numToStr(index+1));
+		let numStr = i18n.t(numToStr(index + 1));
 		let varTitle = i18n.t(`What is the [x] word?`).replace('[x]', numStr);
 		return html`
 			<div class="dots">
-				${this.indexes.map((v, index)=>{
-					let icon = this.varificationStepAnswered?'times':'circle';
-					if(index<this.varificationStep)
-						icon = "check";
-					else if(index>this.varificationStep)
-						icon = "circle";
-					return html`<fa-icon class="dot" icon="${icon}"></fa-icon>`
-				})}
+				${this.indexes.map((v, index) => {
+			let icon = this.varificationStepAnswered ? 'times' : 'circle';
+			if (index < this.varificationStep)
+				icon = "check";
+			else if (index > this.varificationStep)
+				icon = "circle";
+			return html`<fa-icon class="dot" icon="${icon}"></fa-icon>`
+		})}
 			</div>
 			<div class="varification-msg-box">
 				<p class="varification-msg">${msg}</p>
@@ -167,17 +167,17 @@ class KaspaSeedsDialog extends KaspaDialog{
 			<div class="varification-title">${varTitle}</div>
 			<!--div>${this.correctWords[this.varificationStep]} ${this.varificationStepAnswered}</div-->
 			<div class="button-row" @click="${this.wordClick}">
-				${words.map(word=>{
-					return html`
+				${words.map(word => {
+			return html`
 					<flow-btn class="cell" data-word="${word}">
 						${word}
 					</flow-btn>
 					`;
-				})}
+		})}
 			</div>
 		`
 	}
-	renderStep3(){
+	renderStep3() {
 		return html`
 			<div class="dots">
 				<fa-icon class="dot" icon="check"></fa-icon>
@@ -192,55 +192,55 @@ class KaspaSeedsDialog extends KaspaDialog{
 			</p>
 		`
 	}
-	renderStep1Buttons(){
-		if(this.args?.showOnlySeed)
+	renderStep1Buttons() {
+		if (this.args?.showOnlySeed)
 			return
-		return html`<flow-btn primary @click="${e=>this.step=2}" i18n>NEXT</flow-btn>`
+		return html`<flow-btn primary @click="${e => this.step = 2}" i18n>NEXT</flow-btn>`
 	}
-	renderStep2Buttons(){
-		return html`<flow-btn primary @click="${e=>this.step=1}" i18n>BACK TO THE WORDS</flow-btn>`
+	renderStep2Buttons() {
+		return html`<flow-btn primary @click="${e => this.step = 1}" i18n>BACK TO THE WORDS</flow-btn>`
 	}
-	renderStep3Buttons(){
+	renderStep3Buttons() {
 		return html`<flow-btn primary @click="${this.finish}" i18n>DONE</flow-btn>`
 	}
-	updated(changes){
-        super.updated(changes);
-        if(changes.has("step")){
-        	this.inputType = "password";
-        }
-    }
-    changeInputType(){
-    	this.inputType = this.inputType=="password"?'text':'password';
-    }
-    wordClick(e){
-    	let btn = e.target.closest("flow-btn");
-    	if(!btn)
-    		return
-    	let word = btn.dataset.word;
-    	if(this.correctWords[this.varificationStep] == word){
-    		if(this.varificationStep == 2){
-    			this.step = 3;
-    			return
-    		}
-    		this.varificationStepAnswered = '';
-    		this.varificationStep += 1;
-    		this.requestUpdate("answered", null);
-    		return
-    	}
+	updated(changes) {
+		super.updated(changes);
+		if (changes.has("step")) {
+			this.inputType = "password";
+		}
+	}
+	changeInputType() {
+		this.inputType = this.inputType == "password" ? 'text' : 'password';
+	}
+	wordClick(e) {
+		let btn = e.target.closest("flow-btn");
+		if (!btn)
+			return
+		let word = btn.dataset.word;
+		if (this.correctWords[this.varificationStep] == word) {
+			if (this.varificationStep == 2) {
+				this.step = 3;
+				return
+			}
+			this.varificationStepAnswered = '';
+			this.varificationStep += 1;
+			this.requestUpdate("answered", null);
+			return
+		}
 
-    	this.varificationStepAnswered = 'error';
-    	this.requestUpdate("answered", null);
-    }
+		this.varificationStepAnswered = 'error';
+		this.requestUpdate("answered", null);
+	}
 
-    finish(){
-    	this.callback({finished:true, dialog:this});
-    	this.callback = null;
-    	this.hide();
-    }
-    hide(skipHistory=false){
-    	this.mnemonic = "";
-    	super.hide(skipHistory);
-    }
+	finish() {
+		this.callback({ finished: true, dialog: this });
+		this.callback = null;
+		this.hide();
+	}
+	hide(skipHistory = false) {
+		this.mnemonic = "";
+		super.hide(skipHistory);
+	}
 
 }
 

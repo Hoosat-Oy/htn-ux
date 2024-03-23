@@ -4,13 +4,13 @@ import {
 	renderPagination, T
 } from './kaspa-dialog.js';
 
-class KaspaTXDialog extends KaspaDialog{
-	static get properties(){
+class KaspaTXDialog extends KaspaDialog {
+	static get properties() {
 		return {
-			skip:{type:Number}
+			skip: { type: Number }
 		}
 	}
-	static get styles(){
+	static get styles() {
 		return [KaspaDialog.styles, paginationStyle, txListStyle,
 		css`
 			:host{
@@ -38,7 +38,7 @@ class KaspaTXDialog extends KaspaDialog{
 			.tx-list{height:initial}
 		`]
 	}
-	render(){
+	render() {
 		const args = this.buildRenderArgs();
 		return html`
 			<div class="container">
@@ -57,50 +57,50 @@ class KaspaTXDialog extends KaspaDialog{
 			</div>
 		`
 	}
-	constructor(){
+	constructor() {
 		super();
 		this.skip = 0;
 		this.limit = 100;
 		this._onPaginationClick = this.onPaginationClick.bind(this);
 	}
-	renderHeading(){
+	renderHeading() {
 		return html`${this.renderBackBtn()} ${T('Transactions')} <div class="flex"></div>
-		${this.loading?html`<fa-icon class="spinner" icon="sync"></fa-icon>`:''}`;
+		${this.loading ? html`<fa-icon class="spinner" icon="sync"></fa-icon>` : ''}`;
 	}
-	renderBody(args){
-		let {skip} = this;
-		let {items} = args
+	renderBody(args) {
+		let { skip } = this;
+		let { items } = args
 		return html`
-			${this.wallet._renderAllTX({skip, items})}
+			${this.wallet._renderAllTX({ skip, items })}
 			<div class="error">${this.errorMessage}</div>`;
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
 		this.wallet = args.wallet;
 		this.show();
 	}
-	buildRenderArgs(){
-		let totalItems = this.wallet?.txs||[];
-		let {limit} = this;
+	buildRenderArgs() {
+		let totalItems = this.wallet?.txs || [];
+		let { limit } = this;
 		let pagination = buildPagination(totalItems.length, this.skip, limit)
-		let items = totalItems.slice(this.skip, this.skip+limit);
-		return {items, pagination}
+		let items = totalItems.slice(this.skip, this.skip + limit);
+		return { items, pagination }
 	}
-	onPaginationClick(e){
+	onPaginationClick(e) {
 		let skip = e.target.closest("[data-skip]").dataset.skip;
-		if(skip === undefined)
+		if (skip === undefined)
 			return
 		this.skip = +skip;
 	}
-	onNewTx(){
-		if(!this.classList.contains('active'))
+	onNewTx() {
+		if (!this.classList.contains('active'))
 			return
 		this.requestUpdate("tx-list", null)
 	}
-    getFormData(){
-    	//let address = this.qS(".address").value;
-    }
+	getFormData() {
+		//let address = this.qS(".address").value;
+	}
 }
 
 KaspaTXDialog.define("kaspa-tx-dialog");

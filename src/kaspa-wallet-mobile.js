@@ -5,19 +5,19 @@ import {
 	getTheme, setTheme, flow, T, i18nFormat, i18nHTMLFormat,
 	FlowI18nDialog, askForPassword, i18n, getLocalWallet, Wallet
 } from './kaspa-wallet-ui.js';
-export {isMobile, dontInitiatedComponent};
-export class KaspaWalletMobile extends KaspaWalletUI{
+export { isMobile, dontInitiatedComponent };
+export class KaspaWalletMobile extends KaspaWalletUI {
 
 	static get properties() {
 		return {
-			txSkip:{type:Number},
-			hideI18nIcon:{type:Boolean},
-			locked:{type:Boolean, reflect:true},
-			reloadOnLock:{type:Boolean}
+			txSkip: { type: Number },
+			hideI18nIcon: { type: Boolean },
+			locked: { type: Boolean, reflect: true },
+			reloadOnLock: { type: Boolean }
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [KaspaWalletUI.styles, paginationStyle, swipeableStyle, css`
 			:host{
 				padding:0px;display:flex;flex-direction:column;
@@ -267,7 +267,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		this._onTXPaginationClick = this.onTXPaginationClick.bind(this);
 		this._onUTXOPaginationClick = this.onUTXOPaginationClick.bind(this);
 	}
-	toggleFullScreen(){
+	toggleFullScreen() {
 		if (this.fullscreen)
 			document.webkitExitFullscreen();
 		else
@@ -275,12 +275,12 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 
 		this.fullscreen = !this.fullscreen;
 	}
-	render(){
-		let {selectedTab, wallet} = this;
+	render() {
+		let { selectedTab, wallet } = this;
 		let isReady = !!wallet?.balance;
-		const sCls = tab=>tab==selectedTab?'selected flow-swipeable':'flow-swipeable';
-		const {inUseUTXOs={satoshis:0, count:0}} = this.walletDebugInfo;
-		let PWAVersion = window.PWA?.version||'';
+		const sCls = tab => tab == selectedTab ? 'selected flow-swipeable' : 'flow-swipeable';
+		const { inUseUTXOs = { satoshis: 0, count: 0 } } = this.walletDebugInfo;
+		let PWAVersion = window.PWA?.version || '';
 
 		let donationAddresses = [
 			["Devfund donations:", "kaspa:precqv0krj3r6uyyfa36ga7s0u9jct0v4wg8ctsfde2gkrsgwgw8jgxfzfc98"],
@@ -293,42 +293,42 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		<div class="tabs-container hide-scrollbar" ?not-ready=${!isReady}>
 			<flow-menu class="tabs" selected="${selectedTab}"
 				selector=".tab" valueAttr="tab" @select="${this.onTabSelect}">
-				${this.showBalanceTab? html`<a class="tab" 
-					tab="balance" href="javascript:void 0" is="i18n-a">Balance</a>`:''}
+				${this.showBalanceTab ? html`<a class="tab" 
+					tab="balance" href="javascript:void 0" is="i18n-a">Balance</a>`: ''}
 				<a class="tab" tab="transactions" href="javascript:void 0" is="i18n-a">Transactions</a>
 				<a class="tab" tab="wallet" href="javascript:void 0" is="i18n-a">Wallet</a>
-				${this.hideFaucet? '': html`<a class="tab"
+				${this.hideFaucet ? '' : html`<a class="tab"
 					tab="faucet" href="javascript:void 0" is="i18n-a">Faucet</a>`}
-				${this.hideNetwork? '': html`<a class="tab"
+				${this.hideNetwork ? '' : html`<a class="tab"
 					tab="network" href="javascript:void 0" is="i18n-a">Network</a>`}
-				${this.hideDebug? '': html`<a class="tab"
+				${this.hideDebug ? '' : html`<a class="tab"
 					tab="debuginfo" href="javascript:void 0" is="i18n-a">Debug</a>`}
-				${this.hideUTXOs? '': html`<a class="tab"
+				${this.hideUTXOs ? '' : html`<a class="tab"
 					tab="utxos" href="javascript:void 0" is="i18n-a">UTXOs</a>
-					<fa-icon ?hidden=${selectedTab!="utxos"}
-						class="reload-utxo-btn ${this.reloadingUTXOs?'spinner':''}"
+					<fa-icon ?hidden=${selectedTab != "utxos"}
+						class="reload-utxo-btn ${this.reloadingUTXOs ? 'spinner' : ''}"
 						icon="sync" @click=${this.reloadUTXOs}></fa-icon>`}
 			</flow-menu>
 		</div>
 		<div class="tab-contents flow-swipeable-container" ?not-ready=${!isReady}>
 			<div class="flow-swipeable-row">
-				${this.showBalanceTab? html`<div 
+				${this.showBalanceTab ? html`<div 
 					class="tab-content ${sCls('balance')}" for="balance">
 					<div class="error-message" 
 						?hidden=${!this.errorMessage}>${this.errorMessage}</div>
 					${this.renderAddressAndQr()}
 					${this.renderBalanceAndButton()}
-					${this.renderTX({hideTxBtn:true, onlyNonConfirmed:true})}
-				</div>`:''}
+					${this.renderTX({ hideTxBtn: true, onlyNonConfirmed: true })}
+				</div>`: ''}
 				<div class="tab-content v-box pb-0 ${sCls('transactions')}" for="transactions">
 					${this.renderAllTX()}
 				</div>
 				<div class="tab-content ${sCls('wallet')}" for="wallet">
 					<div class="wallet-ux">
 						<div class="badge" is="i18n-div">KASPA WALLET</div>
-						${ PWAVersion ? html`<div class="badge"><span is="i18n-span">Version</span> ${PWAVersion}</div>` : '' }
+						${PWAVersion ? html`<div class="badge"><span is="i18n-span">Version</span> ${PWAVersion}</div>` : ''}
 						<div class="badge"><span is="i18n-span">Status:</span> ${this.status}</div>
-						<div class="badge"><span is="i18n-span">Network:</span> ${(this.receiveAddress||"").split(":")[0]||""}</div>
+						<div class="badge"><span is="i18n-span">Network:</span> ${(this.receiveAddress || "").split(":")[0] || ""}</div>
 
 						<flow-btn class="center-btn primary v-margin"
 							@click="${this.compoundUTXOs}" i18n>Compound Transactions</flow-btn>
@@ -337,22 +337,20 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						<flow-btn class="center-btn primary v-margin"
 							?disabled=${this.updatingTransactionsTime}
 							@click="${this.updateTransactionsTime}" i18n>Update transaction times</flow-btn>
-						${
-							this.updatingTransactionsTimeStatus?
-							html`
+						${this.updatingTransactionsTimeStatus ?
+				html`
 							<div class="transactions-update-status">
-								${
-									this.updatingTransactionsTimeStatus.total==0 || 
-									(this.updatingTransactionsTimeStatus.total == this.updatingTransactionsTimeStatus.updated)?
-									"All transactions updated":
-									html`Transactions updated:
+								${this.updatingTransactionsTimeStatus.total == 0 ||
+						(this.updatingTransactionsTimeStatus.total == this.updatingTransactionsTimeStatus.updated) ?
+						"All transactions updated" :
+						html`Transactions updated:
 									${this.updatingTransactionsTimeStatus.updated}
 									/
 									${this.updatingTransactionsTimeStatus.total}`
-								}
+					}
 							</div>
-							`:''
-						}
+							`: ''
+			}
 						<flow-btn class="center-btn primary v-margin"
 							@click="${this.showSeeds}" i18n>Backup Seed</flow-btn>
 						<flow-btn class="center-btn primary v-margin"
@@ -371,18 +369,17 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 							<p is="i18n-p">
 								if you wish to further the development of the kaspa ecosystem, we accept kaspa donations at the following addresses:
 							</p>
-							${
-								donationAddresses.map((t) => {
-									let [title, address] = t;
-									return html`
+							${donationAddresses.map((t) => {
+				let [title, address] = t;
+				return html`
 									<div class="donation-address-box badge">
 										<flow-i18n text="${title}"></flow-i18n>
 										<input class="address" value="${address}" />
 										<fa-icon @click="${this.copyDonationAddress}"
 											icon="copy" title="${i18n.t("Copy to clipboard")}"></fa-icon>
 									</div>`
-								})
-							}
+			})
+			}
 						</flow-expandable>
 
 						<flow-expandable class="developer-info" _expand no-info no-icon icon="-">
@@ -400,26 +397,26 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 
 					</div>
 				</div>
-				${this.hideFaucet? '': html`
+				${this.hideFaucet ? '' : html`
 				<div class="tab-content ${sCls('faucet')}" for="faucet">
 					${this.faucetStatus ? this.faucetStatus : html`
 
 						<div class="faucet-ux">
 							<div class="margin-bottom"  is="i18n-div">KASPA FAUCET</div>
-							<div>${i18nFormat('Your IP is [n]', this.ip||"")}</div>
-							<div class="margin">${i18nHTMLFormat('You have <b>[n] HTN</b> available.', KAS(this.faucetFundsAvailable||0) )}</div>
+							<div>${i18nFormat('Your IP is [n]', this.ip || "")}</div>
+							<div class="margin">${i18nHTMLFormat('You have <b>[n] HTN</b> available.', KAS(this.faucetFundsAvailable || 0))}</div>
 
 							${this.faucetPeriod ? html`
 								<div class="margin-bottom">${i18nHTMLFormat('Additional funds will be<br/>available in [n]', FlowFormat.duration(this.faucetPeriod))}</div>
-							`:``}
-							${ !this.faucetFundsAvailable ? html`` : html`
+							`: ``}
+							${!this.faucetFundsAvailable ? html`` : html`
 								<flow-btn class="primary" @click="${this.requestFaucetFunds}" i18n>Request Funds from Faucet</flow-btn>
 							`}
 						</div>
 
 					`}
 				</div>`}
-				${this.hideNetwork? '': html`
+				${this.hideNetwork ? '' : html`
 				<div class="tab-content ${sCls('network')}" for="network">
 					<div class='network-ux'>
 						<div class='caption'>Network Status</div>
@@ -430,15 +427,15 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 									<tr><td>DAA Score</td><td>${FlowFormat.commas(this.blueScore)}</td></tr>
 									<tr><td>DAG Header</td><td>${FlowFormat.commas(this.headerCount)}</td></tr>
 									<tr><td>DAG Blocks</td><td>${FlowFormat.commas(this.blockCount)}</td></tr>
-									<tr><td>Difficulty</td><td>${FlowFormat.commas(this.difficulty,2)}</td></tr>
+									<tr><td>Difficulty</td><td>${FlowFormat.commas(this.difficulty, 2)}</td></tr>
 									<tr><td>Median Offset</td><td>${this.getTimeDelta(this.pastMedianTimeDiff)}</td></tr>
-									<tr><td>Median Time UTC</td><td>${this.pastMedianTime?(new Date(this.pastMedianTime)).toJSON().replace(/T/,' ').replace(/\..+$/,''):''}</td></tr>
+									<tr><td>Median Time UTC</td><td>${this.pastMedianTime ? (new Date(this.pastMedianTime)).toJSON().replace(/T/, ' ').replace(/\..+$/, '') : ''}</td></tr>
 								</table>
 							</div>
 						`}
 						</div>
 				</div>`}
-				${this.hideDebug? '': html`
+				${this.hideDebug ? '' : html`
 				<div class="tab-content ${sCls('debuginfo')}" for="debuginfo">
 					<div class="info-ux">
 						<div class='caption'>
@@ -449,7 +446,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						</div>
 						<table>
 							<tr><td is="i18n-td">COUNT</td><td>${inUseUTXOs.count}</td></tr>
-							<tr><td is="i18n-td">AMOUNT</td><td>${KAS(inUseUTXOs.satoshis||0)} HTN</td></tr>
+							<tr><td is="i18n-td">AMOUNT</td><td>${KAS(inUseUTXOs.satoshis || 0)} HTN</td></tr>
 						</table>
 						<flow-btn class="center-btn primary v-margin"
 							@click="${this.showUTXOs}" i18n>Show UTXOs</flow-btn>
@@ -460,7 +457,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 						${this.renderExtraScaning()}
 					</div>
 				</div>`}
-				${this.hideUTXOs? '': html`<div class="tab-content v-box pb-0 ${sCls('utxos')}" for="utxos">
+				${this.hideUTXOs ? '' : html`<div class="tab-content v-box pb-0 ${sCls('utxos')}" for="utxos">
 					${this.renderUTXOs()}
 				</div>`}
 			</div>
@@ -468,16 +465,16 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		${this.renderLockScreen()}
 		`
 	}
-	copyDonationAddress(e){
+	copyDonationAddress(e) {
 		let el = e.target?.closest(".donation-address-box");
 		let input = el?.querySelector("input.address");
-		if (!input){
+		if (!input) {
 			return
 		}
 		this.copyInputToClipboard(input);
 	}
-	renderHeaderBar(){
-		let {wallet} = this;
+	renderHeaderBar() {
+		let { wallet } = this;
 		let isReady = !!wallet?.balance;
 		let loadingIndicator = this.isLoading || !!this.preparingTxNotifications.size
 		let theme = flow.app.getTheme("light")
@@ -490,7 +487,7 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 			<div class="flex"></div>
 			<div class='header-status' ?hidden=${!this.isOfflineBadge}>
 				<div class="header-row">
-					<div>${T(this.isOnline?'ONLINE':'OFFLINE')}</div>
+					<div>${T(this.isOnline ? 'ONLINE' : 'OFFLINE')}</div>
 					<div><fa-icon class="offline-icon" icon="exclamation-triangle"></fa-icon></div>
 				</div>
 			</div>
@@ -500,16 +497,16 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 			<fa-icon class="lock-btn" ?hidden=${(this.locked || !this.wallet)}
 				@click=${this.lockWallet}
 				icon="lock"></fa-icon>
-			${this.hideI18nIcon? '': html`<div class="language-icon">
+			${this.hideI18nIcon ? '' : html`<div class="language-icon">
 				<fa-icon icon="icons:language"
 				@click="${this.onLangClick}"></fa-icon></div>`}
 			<fa-icon class="theme-btn" @click=${this.toggleTheme}
-				icon="${theme=="light"?'moon': 'sun'}"></fa-icon>
+				icon="${theme == "light" ? 'moon' : 'sun'}"></fa-icon>
 		</div>
 		`
 	}
 
-	renderLockScreen(){
+	renderLockScreen() {
 		return html`
 			<div class="lock-screen">
 				<div><img class="big-logo" src="/resources/logo512.png"></div>
@@ -519,44 +516,44 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		`;
 	}
 
-	unlockWallet(){
-		askForPassword({confirmBtnText:i18n.t("UNLOCK")}, async({btn, password})=>{
-    		if(btn!="confirm")
-    			return
-    		let encryptedMnemonic = getLocalWallet().mnemonic;
-    		let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
-    		if(!valid)
-    			return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
+	unlockWallet() {
+		askForPassword({ confirmBtnText: i18n.t("UNLOCK") }, async ({ btn, password }) => {
+			if (btn != "confirm")
+				return
+			let encryptedMnemonic = getLocalWallet().mnemonic;
+			let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
+			if (!valid)
+				return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
 
 			this.locked = false;
 			this.requestUpdate("locked", true);
 		})
 	}
 
-	lockWallet(){
-		if (this.reloadOnLock){
+	lockWallet() {
+		if (this.reloadOnLock) {
 			window.location.reload();
 			return
 		}
 		this.locked = true;
 		this.requestUpdate("locked", false);
 	}
-	onLangClick(e){
+	onLangClick(e) {
 		this.openI18nDialog(e.target);
 	}
-	openI18nDialog(target){
+	openI18nDialog(target) {
 		FlowI18nDialog.open(target);
 	}
-	toggleTheme(){
+	toggleTheme() {
 		let theme = flow.app.getTheme("light");
-		flow.app.setTheme(theme=="light"?'dark':'light');
+		flow.app.setTheme(theme == "light" ? 'dark' : 'light');
 		this.requestUpdate("theme", theme)
 	}
-	onTabClick(e){
+	onTabClick(e) {
 		//alert("onTabClick:"+e.target)
 	}
-	renderMenu(){
-		if(!this.wallet)
+	renderMenu() {
+		if (!this.wallet)
 			return '';
 
 		return html`
@@ -569,19 +566,19 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 			</flow-menu>
 		</flow-dropdown>`
 	}
-	renderAddressAndQr(){
-		if(!this.wallet)
+	renderAddressAndQr() {
+		if (!this.wallet)
 			return '';
 
-		let address = this.receiveAddress||"";
+		let address = this.receiveAddress || "";
 		return html`
 		<div class="address-and-qr">
 			<div class="address-box">
 				<flow-i18n>Receive Address:</flow-i18n>
 				<div class="address-holder">
 					<textarea class="address-input" readonly 
-						@click="${()=>this.openAddressExplorer(address)}"
-						.value="${address||""}"></textarea>
+						@click="${() => this.openAddressExplorer(address)}"
+						.value="${address || ""}"></textarea>
 					<fa-icon ?hidden=${!address} class="copy-address"
 						@click="${this.copyAddress}"
 						title="${T('Copy to clipboard')}" icon="copy"></fa-icon>
@@ -590,27 +587,27 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 			<flow-qrcode data="${address}"></flow-qrcode>
 		</div>`
 	}
-	openAddressExplorer(address){
+	openAddressExplorer(address) {
 		if (!address)
 			return
 		let url = `https://explorer.hoosat.fi/addresses/${address}`;
 
 		window.open(url);
 	}
-	renderBalanceAndButton(){
-		if(!this.wallet || !this.wallet.balance)
+	renderBalanceAndButton() {
+		if (!this.wallet || !this.wallet.balance)
 			return html``;
 
-		const { balance : { available, pending } } = this.wallet;
-		const total = available+pending;
+		const { balance: { available, pending } } = this.wallet;
+		const total = available + pending;
 		return html`
   			<div class="balance-badge">
-				${ this.isLoading ? html`
+				${this.isLoading ? html`
 					<div class="balance">
 						<span class="value" is="i18n-span">SCANNING...</span>
 					</div>
 					<div class="balance pending">
-						<span class="label-pending">${T('PLEASE WAIT')} <span class="dots">${this.dots}</span> ${total ? this.formatKAS(total)+' HTN':''}</span>
+						<span class="label-pending">${T('PLEASE WAIT')} <span class="dots">${this.dots}</span> ${total ? this.formatKAS(total) + ' HTN' : ''}</span>
 					</div>
 				` : html`
 					<div class="balance">
@@ -639,62 +636,62 @@ export class KaspaWalletMobile extends KaspaWalletUI{
 		`;
 	}
 
-	onTXPaginationClick(e){
+	onTXPaginationClick(e) {
 		let skip = e.target.closest("[data-skip]")?.dataset.skip;
-		if(skip === undefined)
+		if (skip === undefined)
 			return
 		this.txSkip = +skip;
 	}
-	onUTXOPaginationClick(e){
+	onUTXOPaginationClick(e) {
 		let skip = e.target.closest("[data-skip]")?.dataset.skip;
-		if(skip === undefined)
+		if (skip === undefined)
 			return
 		this.utxoSkip = +skip;
 	}
-	firstUpdated(){
+	firstUpdated() {
 		super.firstUpdated();
 		let swipeableContainer = this.renderRoot.querySelector(".flow-swipeable-container");
 		this.swipeable = new FlowSwipeable(swipeableContainer, {
-			drag:false,
-			onSwipe:({index, element})=>{
+			drag: false,
+			onSwipe: ({ index, element }) => {
 				let tab = element?.getAttribute("for");
-				if(!tab)
+				if (!tab)
 					return
 				this.selectTab(tab);
 			}
 		});
 	}
-	onTabSelect(e){
-		let {selected} = e.detail;
+	onTabSelect(e) {
+		let { selected } = e.detail;
 		this.selectTab(selected);
 	}
-	selectTab(tab){
-		if(this.selectedTab == tab)
+	selectTab(tab) {
+		if (this.selectedTab == tab)
 			return
 		//console.log("selectTab", tab)
 		this.selectedTab = tab;
 		this.requestUpdate("selectedTab", null)
 		let tabEl = this.renderRoot.querySelector(`.tab[tab='${tab}']`);
 		//console.log("selectTab", tab, tabEl)
-		if(!tabEl)
+		if (!tabEl)
 			return
 		tabEl.scrollIntoView();
 		let index = [...tabEl.parentNode.children].indexOf(tabEl)
-		
-		if(index <0)
+
+		if (index < 0)
 			return
 		this.swipeable.setActive(index)
 
 	}
 
-	showSendDialog(){
-		this.sendDialog.open({wallet:this}, (args)=>{
+	showSendDialog() {
+		this.sendDialog.open({ wallet: this }, (args) => {
 			this.sendTx(args);
 		})
 	}
-	showReceiveDialog(){
-		let address = this.receiveAddress||'hoosat:abc'
-		this.receiveDialog.open({wallet:this, address}, (args)=>{
+	showReceiveDialog() {
+		let address = this.receiveAddress || 'hoosat:abc'
+		this.receiveDialog.open({ wallet: this, address }, (args) => {
 			//
 		})
 	}

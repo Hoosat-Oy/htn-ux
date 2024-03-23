@@ -1,14 +1,14 @@
-import {html, css, KaspaDialog, T, i18n} from './kaspa-dialog.js';
+import { html, css, KaspaDialog, T, i18n } from './kaspa-dialog.js';
 
-class KaspaWalletReceiveDialog extends KaspaDialog{
-	static get properties(){
+class KaspaWalletReceiveDialog extends KaspaDialog {
+	static get properties() {
 		return {
-			qrdata:{type:String},
-			address:{type:String}
+			qrdata: { type: String },
+			address: { type: String }
 		}
 	}
-	static get styles(){
-		return [KaspaDialog.styles, 
+	static get styles() {
+		return [KaspaDialog.styles,
 		css`
 			.container{max-height:400px}
 			.buttons{justify-content:center;}
@@ -20,10 +20,10 @@ class KaspaWalletReceiveDialog extends KaspaDialog{
 			flow-input flow-btn{margin-bottom:0px;}
 		`]
 	}
-	renderHeading(){
+	renderHeading() {
 		return html`${T('RECEIVE')}`;
 	}
-	renderBody(){
+	renderBody() {
 		return html`
 			<flow-qrcode data="${this.qrdata}" ntype="6"></flow-qrcode>
 			<flow-input label="${T('Address')}" class="full-width" readonly 
@@ -33,18 +33,18 @@ class KaspaWalletReceiveDialog extends KaspaDialog{
 			</flow-input>
 			<input class="address" value="${this.address}">`;
 	}
-	renderButtons(){
+	renderButtons() {
 		return html`<flow-btn @click="${this.hide}" i18n>CLOSE</flow-btn>`
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
-		const {address} = args;
+		const { address } = args;
 		this.qrdata = address;
 		this.address = address;
 		this.show();
 	}
-	copyAddress(){
+	copyAddress() {
 		let input = this.renderRoot.querySelector("input.address");
 		input.select();
 		input.setSelectionRange(0, 99999)

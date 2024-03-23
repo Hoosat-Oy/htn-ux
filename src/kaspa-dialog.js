@@ -2,29 +2,29 @@ import {
 	html, css, BaseElement, ScrollbarStyle, SpinnerStyle, UID
 } from './flow-ux.js';
 export * from './flow-ux.js';
-import {validatePassword, baseUrl, debug, isMobile} from './wallet.js';
+import { validatePassword, baseUrl, debug, isMobile } from './wallet.js';
 export * from './wallet.js';
-export {baseUrl, debug};
+export { baseUrl, debug };
 const historyStack = [];
 
-if(isMobile){
-	window.addEventListener("popstate", (e)=>{
+if (isMobile) {
+	window.addEventListener("popstate", (e) => {
 		let state = historyStack.pop();
-		let ce = new CustomEvent("_popstate", {detail:{state:e.state, oldState:state}})
+		let ce = new CustomEvent("_popstate", { detail: { state: e.state, oldState: state } })
 		window.dispatchEvent(ce)
 	});
 }
 
-export class KaspaDialog extends BaseElement{
+export class KaspaDialog extends BaseElement {
 
 	static get properties() {
 		return {
-			errorMessage:{type:String},
-			hideable:{type:Boolean, reflect:true}
+			errorMessage: { type: String },
+			hideable: { type: Boolean, reflect: true }
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [ScrollbarStyle, SpinnerStyle, css`
 			:host{
 				z-index:-10;opacity:0;
@@ -106,13 +106,13 @@ export class KaspaDialog extends BaseElement{
 			.body-inner{overflow:hidden;max-height:100%;display:flex;flex-direction:column;}
 		`];
 	}
-	headingCls({modeName}){
-		if(modeName == 'Init')
+	headingCls({ modeName }) {
+		if (modeName == 'Init')
 			return "heading-init";
 		return '';
 	}
 
-	render(){
+	render() {
 		const args = this.buildRenderArgs();
 		let buttons = this.renderButtons(args);
 		let hasButtons = !!buttons;
@@ -126,10 +126,10 @@ export class KaspaDialog extends BaseElement{
 								${this.renderBody(args)}
 							</div>
 						</div>
-						${hasButtons?html`
+						${hasButtons ? html`
 						<div class="buttons">
 							${buttons}
-						</div>`:''}
+						</div>`: ''}
 						<span class="close-btn" title="Close" 
 							@click="${this.onCloseClick}">&times;</span>
 					</div>
@@ -137,95 +137,95 @@ export class KaspaDialog extends BaseElement{
 			</div>
 		`
 	}
-	constructor(){
+	constructor() {
 		super();
-		this._onUrlHistoryPop = e=>{
+		this._onUrlHistoryPop = e => {
 			this.onUrlHistoryPop(e.detail, e);
 		}
 		this.withHistory = window.isMobile;
 	}
-	attachUrlHistoryPopEvent(){
-		if(this.withHistory)
+	attachUrlHistoryPopEvent() {
+		if (this.withHistory)
 			window.addEventListener("_popstate", this._onUrlHistoryPop);
 	}
-	removeUrlHistoryPopEvent(){
+	removeUrlHistoryPopEvent() {
 		window.removeEventListener("_popstate", this._onUrlHistoryPop);
 	}
-	connectedCallback(){
+	connectedCallback() {
 		super.connectedCallback();
 		this.attachUrlHistoryPopEvent();
 	}
-	disconnectedCallback(){
+	disconnectedCallback() {
 		super.disconnectedCallback();
 		this.removeUrlHistoryPopEvent();
 	}
 
-	onUrlHistoryPop({state, oldState}, e){
-		if(oldState?.uid == this.uid){
-			console.log("onUrlHistoryPop:", oldState?.uid == this.uid, {state, oldState})
+	onUrlHistoryPop({ state, oldState }, e) {
+		if (oldState?.uid == this.uid) {
+			console.log("onUrlHistoryPop:", oldState?.uid == this.uid, { state, oldState })
 			this._hide(true);
 		}
 	}
-	pushHistory(uid=""){
-		if(!this.withHistory)
+	pushHistory(uid = "") {
+		if (!this.withHistory)
 			return
 		let name = this.tagName || this.name || this.constructor.name;
 		name = name.replace(/\-/g, "");
 		let key = name.toLowerCase().replace(/(kaspa|dialog|mobile)/g, '')
-		let state = {type:name, uid, key};
-		history.pushState(state, name, "/"+key+"/"+uid);
+		let state = { type: name, uid, key };
+		history.pushState(state, name, "/" + key + "/" + uid);
 		historyStack.push(state)
 	}
-	historyGoBack(){
+	historyGoBack() {
 		history.back();
 	}
-	buildRenderArgs(){
+	buildRenderArgs() {
 		return {};
 	}
-	renderHeading(args){
+	renderHeading(args) {
 		return '';
 	}
-	renderHeading(args){
+	renderHeading(args) {
 		return '';
 	}
-	renderButtons(args){
+	renderButtons(args) {
 		this.classList.add("no-buttons")
 		return ''
 	}
-	renderBackBtn(){
+	renderBackBtn() {
 		return html`<fa-icon class="back-btn" icon="arrow-alt-left"
 			@click=${this.onBackClick}></fa-icon>`;
 	}
-	onBackClick(){
+	onBackClick() {
 		this.hide();
 	}
 
-	firstUpdated(...args){
+	firstUpdated(...args) {
 		super.firstUpdated(...args)
 		this.qS = this.renderRoot.querySelector.bind(this.renderRoot);
 		this.qSAll = this.renderRoot.querySelectorAll.bind(this.renderRoot);
 	}
-    setError(errorMessage){
-    	this.errorMessage = errorMessage;
-    }
-    show(){
+	setError(errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+	show() {
 		this.classList.add('active');
-		this.uid  = this.uid || UID()
+		this.uid = this.uid || UID()
 		this.pushHistory(this.uid)
 	}
-	_hide(skipHistory=false){
+	_hide(skipHistory = false) {
 		this.classList.remove('active');
-		if(!skipHistory && this.withHistory){
+		if (!skipHistory && this.withHistory) {
 			this.historyGoBack();
 		}
 	}
-	hide(skipHistory=false){
+	hide(skipHistory = false) {
 		this._hide(skipHistory);
 	}
-	onCloseClick(){
+	onCloseClick() {
 		this.hide();
 	}
-	checkPassword(password){
-    	return validatePassword(password);
-    }
+	checkPassword(password) {
+		return validatePassword(password);
+	}
 }

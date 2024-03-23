@@ -3,15 +3,15 @@ import {
 	formatForMachine, formatForHuman
 } from './kaspa-dialog.js';
 
-class KaspaReceiveDialogMobile extends KaspaDialog{
-	static get properties(){
+class KaspaReceiveDialogMobile extends KaspaDialog {
+	static get properties() {
 		return {
-			address:{type:String},
-			amount:{type:String}
+			address: { type: String },
+			amount: { type: String }
 		}
 	}
-	static get styles(){
-		return [KaspaDialog.styles, 
+	static get styles() {
+		return [KaspaDialog.styles,
 		css`
 			.container{
 				border-radius:0px;width:100%;height:100%;border:0px;
@@ -45,16 +45,16 @@ class KaspaReceiveDialogMobile extends KaspaDialog{
 			}
 		`]
 	}
-	renderHeading(){
+	renderHeading() {
 		return html`${this.renderBackBtn()} RECEIVE`;
 	}
-	renderBody(){
-		let {amount='', address=''} = this;
-		let amountStr = amount?'?amount='+amount:'';
+	renderBody() {
+		let { amount = '', address = '' } = this;
+		let amountStr = amount ? '?amount=' + amount : '';
 		return html`
-			<flow-qrcode data="${address+amountStr}" ntype="6"></flow-qrcode>
+			<flow-qrcode data="${address + amountStr}" ntype="6"></flow-qrcode>
 			<flow-input class="address full-width" suffix-btn
-				label="${T('Request URL')}" readonly value="${address+amountStr}">
+				label="${T('Request URL')}" readonly value="${address + amountStr}">
 				<flow-btn slot="suffix" class="primary"
 					@click="${this.copyAddress}" icon="copy"></flow-btn>
 			</flow-input>
@@ -70,52 +70,52 @@ class KaspaReceiveDialogMobile extends KaspaDialog{
 			</flow-btn>
 			`;
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
 		this.wallet = args.wallet;
-		this.address = args.address||"";
-		this.amount = args.amount||"";
+		this.address = args.address || "";
+		this.amount = args.amount || "";
 		this.show();
 	}
-	copyAddress(){
+	copyAddress() {
 		let input = this.renderRoot.querySelector(".address").renderRoot.querySelector("input");
 		input.select();
 		input.setSelectionRange(0, 99999)
 		document.execCommand("copy");
-		input.setSelectionRange(0,0)
+		input.setSelectionRange(0, 0)
 		input.blur();
 	}
-	async copyFromClipboard(){
+	async copyFromClipboard() {
 		const address = await navigator.clipboard.readText();
 		this.setAmount(address)
 	}
 
-	showT9(e){
+	showT9(e) {
 		let input = e.target.closest("flow-input");
-		let {value=''} = input;
+		let { value = '' } = input;
 		showT9({
 			value,
-			heading:input.label.replace("in HTN", ""),
-			inputLabel:input.label
-		}, ({value, dialog})=>{
+			heading: input.label.replace("in HTN", ""),
+			inputLabel: input.label
+		}, ({ value, dialog }) => {
 			console.log("t9 result", value)
 			input.value = value;
 			this.onAmountChange();
 			dialog.hide();
 		})
 	}
-    cancel(){
-    	this.hide();
-    }
-    onAmountChange(){
-    	this.updateQRCode();
-    }
-    updateQRCode(){
-    	this.amount = this.qS(".amount").value;
+	cancel() {
+		this.hide();
+	}
+	onAmountChange() {
+		this.updateQRCode();
+	}
+	updateQRCode() {
+		this.amount = this.qS(".amount").value;
 
 
-    }
+	}
 }
 
 KaspaReceiveDialogMobile.define("kaspa-receive-dialog-mobile");

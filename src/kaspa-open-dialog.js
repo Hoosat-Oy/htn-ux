@@ -1,19 +1,19 @@
-import {html, css, KaspaDialog, i18n, T} from './kaspa-dialog.js';
-import {askForPassword} from "./wallet.js";
+import { html, css, KaspaDialog, i18n, T } from './kaspa-dialog.js';
+import { askForPassword } from "./wallet.js";
 const pass = "";
 
-class KaspaOpenDialog extends KaspaDialog{
+class KaspaOpenDialog extends KaspaDialog {
 
 	static get properties() {
 		return {
-			mode:{type:String, reflect:true},
-			inputType:{type:String},
-			isFresh:{type:Boolean, reflect:true},
-			hideLogo:{type:Boolean, reflect:true}
+			mode: { type: String, reflect: true },
+			inputType: { type: String },
+			isFresh: { type: Boolean, reflect: true },
+			hideLogo: { type: Boolean, reflect: true }
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [KaspaDialog.styles, css`
 			.container{max-height:var(--kaspa-dialog-container-max-height, 600px)}
 			:host([mode="create"]) .container{max-height:var(--kaspa-dialog-container-max-height, 500px)}
@@ -40,12 +40,12 @@ class KaspaOpenDialog extends KaspaDialog{
 	constructor() {
 		super();
 
-		window.showWalletInitDialog = (args, callback)=>{
+		window.showWalletInitDialog = (args, callback) => {
 			this.cleanUpForm();
 			//return callback(null, {password:"Asd123###", dialog:this, mode:"open"});
 			this.wallet = args.wallet;
 			this.hideable = !!args.hideable;
-			this.mode = args.mode||"open";
+			this.mode = args.mode || "open";
 			this.lastMode = this.mode;
 			this.callback = callback;
 			this.isFresh = !!args.isFresh;
@@ -54,35 +54,35 @@ class KaspaOpenDialog extends KaspaDialog{
 			this.show();
 		}
 
-		window.hideWalletInitDialog = ()=>{
+		window.hideWalletInitDialog = () => {
 			this.hide();
 		}
 
 		this.mode = "init";
 		this.inputType = "password";
 	}
-	buildRenderArgs(){
-		let {mode} = this;
-		let modeName = mode[0].toUpperCase()+mode.substr(1);
-		return {modeName};
+	buildRenderArgs() {
+		let { mode } = this;
+		let modeName = mode[0].toUpperCase() + mode.substr(1);
+		return { modeName };
 	}
-	renderHeading({modeName}){
-		if(modeName == 'Init')
+	renderHeading({ modeName }) {
+		if (modeName == 'Init')
 			return '';
 		return html`${T(`${modeName} Wallet`)}`;
 	}
-	renderBody({modeName}){
+	renderBody({ modeName }) {
 		return this[`render${modeName}UI`]();
 	}
-	renderButtons({modeName}){
-		return this[`render${modeName}Buttons`]?.()||'';
+	renderButtons({ modeName }) {
+		return this[`render${modeName}Buttons`]?.() || '';
 	}
-	renderInitUI(){
+	renderInitUI() {
 		return html`
 			<div class="sub-heading text-center" is="i18n-div">Welcome to Kaspa Wallet</div>
 		`
 	}
-	renderRecoverUI(){
+	renderRecoverUI() {
 		let rows = [0, 1, 2];
 		let cells = [0, 1, 2, 3];
 		let seed = [];
@@ -91,27 +91,27 @@ class KaspaOpenDialog extends KaspaDialog{
 				Enter your 12-word seed phrase to recover your wallet (words are not case sensitive)
 			</p>
 			<div class="words" @input=${this.onSeedInput}>
-				${rows.map((v, index)=>{
-					return html`
+				${rows.map((v, index) => {
+			return html`
 					<div class="row">
-						${cells.map((v, i)=>{
-							return html`
+						${cells.map((v, i) => {
+				return html`
 							<div class="cell">
-								<input class="seed word" value="${seed[index*4+i]||''}" data-index="${index*4+i}" />
+								<input class="seed word" value="${seed[index * 4 + i] || ''}" data-index="${index * 4 + i}" />
 							</div>
 							`;
-						})}
+			})}
 					</div>
 					`;
-				})}
+		})}
 			</div>
 			<div class="error">${this.errorMessage}</div>
 		`
 	}
-	renderOpenUI(){
-		let icon = this.inputType=="password"?'eye':'eye-slash';
+	renderOpenUI() {
+		let icon = this.inputType == "password" ? 'eye' : 'eye-slash';
 		return html`
-			${this.hideLogo?'': html`
+			${this.hideLogo ? '' : html`
 			<div>
 				<img class="big-logo" src="/resources/logo512.png" />
 			</div>`}
@@ -128,8 +128,8 @@ class KaspaOpenDialog extends KaspaDialog{
 			<div class="bottom-spacer" ?hidden=${!isMobile}></div>
 		`
 	}
-	renderCreateUI(){
-		let icon = this.inputType=="password"?'eye':'eye-slash';
+	renderCreateUI() {
+		let icon = this.inputType == "password" ? 'eye' : 'eye-slash';
 		return html`
 			<div class="sub-heading" is="i18n-div">Create a password for your new wallet</div>
 			<flow-input class="password full-width" outer-border value="${pass}"
@@ -149,122 +149,122 @@ class KaspaOpenDialog extends KaspaDialog{
 			<div class="error">${this.errorMessage}</div>
 		`
 	}
-	_renderOpenButtons(){
+	_renderOpenButtons() {
 		return html`
-			<flow-btn @click="${e=>this.mode='create'}" i18n>NEW WALLET</flow-btn>
+			<flow-btn @click="${e => this.mode = 'create'}" i18n>NEW WALLET</flow-btn>
 			<flow-btn primary @click="${this.openWallet}" i18n>OPEN WALLET</flow-btn>`;
 	}
-	renderCreateButtons(){
+	renderCreateButtons() {
 		return html`
-			<flow-btn @click="${e=>this.mode=this.lastMode}" i18n>Cancel</flow-btn>
+			<flow-btn @click="${e => this.mode = this.lastMode}" i18n>Cancel</flow-btn>
 			<flow-btn ?hidden=${this.isFresh} 
-				@click="${e=>this.mode='recover'}" i18n>I have a wallet</flow-btn>
+				@click="${e => this.mode = 'recover'}" i18n>I have a wallet</flow-btn>
 			<flow-btn primary @click="${this.showSeeds}" i18n>Next</flow-btn>
 			`;
 	}
-	renderInitButtons(){
+	renderInitButtons() {
 		return html`
 			<flow-btn class="primary"
-				@click="${e=>this.mode='create'}" i18n>Create New Wallet</flow-btn>
+				@click="${e => this.mode = 'create'}" i18n>Create New Wallet</flow-btn>
 			<flow-btn class="primary"
-				@click="${e=>this.mode='recover'}" i18n>Recover from Seed</flow-btn>`;
+				@click="${e => this.mode = 'recover'}" i18n>Recover from Seed</flow-btn>`;
 	}
-	renderRecoverButtons(){
-		
+	renderRecoverButtons() {
+
 		return html`
 			<flow-btn @click="${this.cancelRecover}" i18n>Cancel</flow-btn>
 			<flow-btn primary @click="${this.recoverWallet}" i18n>Recover Wallet</flow-btn>`;
 	}
-	cancelRecover(){
-		if(this.args?.backToWallet){
+	cancelRecover() {
+		if (this.args?.backToWallet) {
 			return this.hide()
 		}
 		this.mode = this.lastMode || "init";
 	}
-	updated(changes){
-        super.updated(changes);
-        if(changes.has('mode')){
-        	this.inputType = "password";
-        	this.errorMessage = "";
-        }
-    }
+	updated(changes) {
+		super.updated(changes);
+		if (changes.has('mode')) {
+			this.inputType = "password";
+			this.errorMessage = "";
+		}
+	}
 
-    changeInputType(){
-    	this.inputType = this.inputType=="password"?'text':'password';
-    }
-    onOpenPassKeyup(e){
-    	if(e.which == 13)
-    		this.openWallet();
-    }
-    openWallet(){
-    	let password = this.qS(".password").value;
+	changeInputType() {
+		this.inputType = this.inputType == "password" ? 'text' : 'password';
+	}
+	onOpenPassKeyup(e) {
+		if (e.which == 13)
+			this.openWallet();
+	}
+	openWallet() {
+		let password = this.qS(".password").value;
 
-		this.callback(null, {password, dialog:this});
-    }
-    onCreatePassKeyup(e){
-    	if(e.which == 13)
-    		this.showSeeds();
-    }
-    showSeeds(){
-    	let password = this.qS(".password").value.trim();
-    	let password2 = this.qS(".cfm-password").value;
-    	if(!this.checkPassword(password))
-    		return this.setError(i18n.t("At least 8 characters, one capital, one lower, one number, and one symbol"))
+		this.callback(null, { password, dialog: this });
+	}
+	onCreatePassKeyup(e) {
+		if (e.which == 13)
+			this.showSeeds();
+	}
+	showSeeds() {
+		let password = this.qS(".password").value.trim();
+		let password2 = this.qS(".cfm-password").value;
+		if (!this.checkPassword(password))
+			return this.setError(i18n.t("At least 8 characters, one capital, one lower, one number, and one symbol"))
 
-    	if(password != password2)
-    		return this.setError(i18n.t("Passwords do not match"))
+		if (password != password2)
+			return this.setError(i18n.t("Passwords do not match"))
 
-    	this.callback(null, {mode:"create", password, dialog:this});
-    }
-    onSeedInput(e){
+		this.callback(null, { mode: "create", password, dialog: this });
+	}
+	onSeedInput(e) {
 		let input = e.target.closest("input.seed");
-    	if(!input || input.dataset.index != "0")
-    		return
-		let words = (input.value+"").trim().split(" ");
-    	if(words.length<12)
-    		return;
+		if (!input || input.dataset.index != "0")
+			return
+		let words = (input.value + "").trim().split(" ");
+		if (words.length < 12)
+			return;
 
-    	this.qSAll("input.seed.word").forEach(input=>{
+		this.qSAll("input.seed.word").forEach(input => {
 			let index = input.dataset.index;
-			if(words[index] == undefined)
+			if (words[index] == undefined)
 				input.value = "";
 			else
-    			input.value = words[index];
+				input.value = words[index];
 		});
 
-    }
-    recoverWallet(){
-    	let wordsMap = {};
-    	let isInvalid = false;
-    	this.qSAll("input.seed.word").forEach(input=>{
+	}
+	recoverWallet() {
+		let wordsMap = {};
+		let isInvalid = false;
+		this.qSAll("input.seed.word").forEach(input => {
 			let index = input.dataset.index;
-    		wordsMap[index] = (input.value+"").trim();
-    		if(input.value.length<2)
-    			isInvalid = true;
-    	});
+			wordsMap[index] = (input.value + "").trim();
+			if (input.value.length < 2)
+				isInvalid = true;
+		});
 
-    	let words = [];
-    	for(let i=0; i<12; i++){
-    		words.push(wordsMap[i])
+		let words = [];
+		for (let i = 0; i < 12; i++) {
+			words.push(wordsMap[i])
 		}
 
-    	if(isInvalid || !words.join("").length)
-    		return this.setError(i18n.t("Please provide valid words"));
+		if (isInvalid || !words.join("").length)
+			return this.setError(i18n.t("Please provide valid words"));
 
-    	askForPassword({
-    		title:i18n.t("Password to encryt the wallet"),
-    		confirmBtnText:i18n.t("Encrypt Wallet")
-    	}, ({btn, password})=>{
-    		if(!password || btn != 'confirm')
-    			return
+		askForPassword({
+			title: i18n.t("Password to encryt the wallet"),
+			confirmBtnText: i18n.t("Encrypt Wallet")
+		}, ({ btn, password }) => {
+			if (!password || btn != 'confirm')
+				return
 
-	    	this.callback(null, {seedPhrase:words.join(" ").toLowerCase(), password, dialog:this});
-	    })
+			this.callback(null, { seedPhrase: words.join(" ").toLowerCase(), password, dialog: this });
+		})
 	}
-	
-	cleanUpForm(){
-		this.qSAll("input.seed.word").forEach(input=>{
-    		input.value = "";
+
+	cleanUpForm() {
+		this.qSAll("input.seed.word").forEach(input => {
+			input.value = "";
 		})
 	}
 }

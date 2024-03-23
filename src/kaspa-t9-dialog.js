@@ -4,15 +4,15 @@ import {
 	formatForMachine, formatForHuman
 } from './kaspa-dialog.js';
 
-class KaspaT9Dialog extends KaspaDialog{
-	static get properties(){
+class KaspaT9Dialog extends KaspaDialog {
+	static get properties() {
 		return {
-			value:{type:String},
-			heading:{type:String},
-			inputLabel:{type:String}
+			value: { type: String },
+			heading: { type: String },
+			inputLabel: { type: String }
 		}
 	}
-	static get styles(){
+	static get styles() {
 		return [KaspaDialog.styles, css`
 			.container{
 				width:100%;height:100%;padding:0px;
@@ -28,18 +28,18 @@ class KaspaT9Dialog extends KaspaDialog{
 			}
 		`]
 	}
-	constructor(){
+	constructor() {
 		super();
-		window.showT9 = (args, callback)=>{
+		window.showT9 = (args, callback) => {
 			this.open(args, callback)
 		}
 	}
-	renderHeading(){
+	renderHeading() {
 		return html`${this.renderBackBtn()} ${this.heading}`;
 	}
-	renderBody(){
+	renderBody() {
 		let value = this.value || '';
-		let {inputLabel='Amount in HTN'} = this;
+		let { inputLabel = 'Amount in HTN' } = this;
 		return html`
 		<flow-input class="full-width" clear-btn value="${value}"
 			label="${inputLabel}" readonly @changed=${this.onInputChange}>
@@ -52,30 +52,30 @@ class KaspaT9Dialog extends KaspaDialog{
 		</div>
 		`;
 	}
-	setMaxValue(){
+	setMaxValue() {
 		this.value = this.max;
 	}
-	sendBack(e){
-		this.callback({value:this.value, dialog:this})
+	sendBack(e) {
+		this.callback({ value: this.value, dialog: this })
 	}
-	onInputChange(e){
+	onInputChange(e) {
 		this.value = e.detail.value;
 	}
-	onT9Change(e){
+	onT9Change(e) {
 		this.value = e.detail.value;
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
-		this.value = args.value||'';
-		this.max = args.max||'';
-		this.heading = args.title||args.heading||i18n.t('Amount');
-		this.inputLabel = args.inputLabel||i18n.t('Amount in HTN');
+		this.value = args.value || '';
+		this.max = args.max || '';
+		this.heading = args.title || args.heading || i18n.t('Amount');
+		this.inputLabel = args.inputLabel || i18n.t('Amount in HTN');
 		this.show();
 	}
-    cancel(){
-    	this.hide();
-    }
+	cancel() {
+		this.hide();
+	}
 }
 
 KaspaT9Dialog.define("kaspa-t9-dialog");

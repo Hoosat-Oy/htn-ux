@@ -1,14 +1,14 @@
-import {html, css, FlowFormat, i18n, T} from './kaspa-wallet-ui.js';
-import {KaspaWalletMobile} from './kaspa-wallet-mobile.js';
+import { html, css, FlowFormat, i18n, T } from './kaspa-wallet-ui.js';
+import { KaspaWalletMobile } from './kaspa-wallet-mobile.js';
 
-export class KaspaWalletDesktop extends KaspaWalletMobile{
+export class KaspaWalletDesktop extends KaspaWalletMobile {
 
 	static get properties() {
 		return {
 		};
 	}
 
-	static get styles(){
+	static get styles() {
 		return [KaspaWalletMobile.styles, css`
 			:host{overflow:hidden}
 			.container{
@@ -113,24 +113,24 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
 		this.showBalanceTab = false;
 		this.recentTransactionsHeading = i18n.t("Transactions under process");
 		this.updateTXLimit();
-		this.addEventListener("new-wallet", ()=>{
+		this.addEventListener("new-wallet", () => {
 			this.updateTXLimit();
 		})
 	}
-	updateTXLimit(){
+	updateTXLimit() {
 		let height = this.getBoundingClientRect().height - 10;
 		let h = Math.max(500, height);
-		if(this.parentNode && this.parentNode.getBoundingClientRect){
+		if (this.parentNode && this.parentNode.getBoundingClientRect) {
 			height = this.parentNode.getBoundingClientRect().height - 10;
 			h = Math.max(h, height);
 		}
-		this.txLimit = Math.floor( h / 72);
+		this.txLimit = Math.floor(h / 72);
 	}
-	connectedCallback(){
+	connectedCallback() {
 		super.connectedCallback();
 		this.updateTXLimit();
 	}
-	render(){
+	render() {
 		return html`
 			${this.renderHeaderBar(true)}
 			<div class="container">
@@ -149,34 +149,34 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
 			</div>
 		`
 	}
-	renderHeaderBar(isDesktop=false){
-		if(isDesktop)
+	renderHeaderBar(isDesktop = false) {
+		if (isDesktop)
 			return super.renderHeaderBar();
 		return '';
 	}
-	renderAllTX(){
+	renderAllTX() {
 		return html`
 		${this.renderTxNotifications()}
 		${super.renderAllTX()}`
 	}
-	renderTxNotifications(){
+	renderTxNotifications() {
 		let notifications = [...this.preparingTxNotifications.values()];
-		if(!notifications.length)
+		if (!notifications.length)
 			return '';
 
 		return html`<div class="tx-notifications">
-				${notifications.map(n=>{
-					return html`<div class="tx-notification">
-						${n.compoundUTXOs?
-							html`${T('Compounding UTXOs...')}`:
-							i18n.t(`Preparing transaction for [n] KAS ....`)
-								.replace('[n]', this.formatKAS(n.amount))}
+				${notifications.map(n => {
+			return html`<div class="tx-notification">
+						${n.compoundUTXOs ?
+					html`${T('Compounding UTXOs...')}` :
+					i18n.t(`Preparing transaction for [n] KAS ....`)
+						.replace('[n]', this.formatKAS(n.amount))}
 					</div>`
-				})}
+		})}
 			</div>`;
 	}
-	renderAddress(){
-		if(!this.wallet)
+	renderAddress() {
+		if (!this.wallet)
 			return '';
 
 		return html`
@@ -184,19 +184,19 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
 			<div is="i18n-div">Receive Address:</div>
 			<div class="address-holder">
 				<textarea class="address-input" readonly
-					@click="${()=>this.openAddressExplorer(this.receiveAddress||"")}"
-					.value="${this.receiveAddress||''}"></textarea>
+					@click="${() => this.openAddressExplorer(this.receiveAddress || "")}"
+					.value="${this.receiveAddress || ''}"></textarea>
 				<fa-icon ?hidden=${!this.receiveAddress} class="copy-address"
 					@click="${this.copyAddress}"
 					title="${T('Copy to clipboard')}" icon="copy"></fa-icon>
 			</div>
 		</div>`
 	}
-	renderBalance(){
-		if(!this.wallet || !this.wallet.balance)
+	renderBalance() {
+		if (!this.wallet || !this.wallet.balance)
 			return html``;
 
-		const { balance : { available, pending } } = this.wallet;
+		const { balance: { available, pending } } = this.wallet;
 		return html`
   			<div class="balance-badge">
                 <div class="balance">
@@ -210,12 +210,12 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
             </div>
 		`;
 	}
-	renderQRAndSendBtn(){
-		if(!this.wallet)
+	renderQRAndSendBtn() {
+		if (!this.wallet)
 			return '';
 		return html`
 			<div class="qr-code-holder">
-				<flow-qrcode data="${this.receiveAddress||""}" ntype="6"></flow-qrcode>
+				<flow-qrcode data="${this.receiveAddress || ""}" ntype="6"></flow-qrcode>
 				<div class="buttons-holder">
 					<flow-btn primary @click="${this.showSendDialog}" i18n>SEND</flow-btn>
 					<div style="flex:1;width:20px;"></div>
@@ -224,33 +224,32 @@ export class KaspaWalletDesktop extends KaspaWalletMobile{
 				</div>
 			</div>
 			<div class="status">
-				${T('Wallet Status:')} ${this.status||T('Offline')}<br/>
-				${
-					this.blockCount == 1 ?
-					html`${T('DAG headers:')} ${this.headerCount?FlowFormat.commas(this.headerCount):''}` :
-					html`${T('DAA score:')} ${this.blueScore?FlowFormat.commas(this.blueScore):''}`
-				}
+				${T('Wallet Status:')} ${this.status || T('Offline')}<br/>
+				${this.blockCount == 1 ?
+				html`${T('DAG headers:')} ${this.headerCount ? FlowFormat.commas(this.headerCount) : ''}` :
+				html`${T('DAA score:')} ${this.blueScore ? FlowFormat.commas(this.blueScore) : ''}`
+			}
 				
 			</div>
 		`
 	}
-	initWallet(encryptedMnemonic){
-		if(encryptedMnemonic){
+	initWallet(encryptedMnemonic) {
+		if (encryptedMnemonic) {
 			showWalletInitDialog({
-				mode:"open",
-				wallet:this,
-				hideable:false
-			}, (err, info)=>{
+				mode: "open",
+				wallet: this,
+				hideable: false
+			}, (err, info) => {
 				info.encryptedMnemonic = encryptedMnemonic;
 				this.handleInitDialogCallback(info)
 			})
-		}else{
+		} else {
 			showWalletInitDialog({
-				mode:"init",
-				wallet:this,
-				hideable:false,
-				isFresh:true
-			}, (err, info)=>{
+				mode: "init",
+				wallet: this,
+				hideable: false,
+				isFresh: true
+			}, (err, info) => {
 				this.handleInitDialogCallback(info)
 			})
 		}

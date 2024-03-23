@@ -4,13 +4,13 @@ import {
 	formatForMachine, formatForHuman
 } from './kaspa-dialog.js';
 
-class KaspaQRScannerDialog extends KaspaDialog{
-	static get properties(){
+class KaspaQRScannerDialog extends KaspaDialog {
+	static get properties() {
 		return {
-			value:{type:String}
+			value: { type: String }
 		}
 	}
-	static get styles(){
+	static get styles() {
 		return [KaspaDialog.styles, css`
 			.container{
 				width:100%;height:100%;padding:0px;
@@ -22,22 +22,22 @@ class KaspaQRScannerDialog extends KaspaDialog{
 
 		`]
 	}
-	constructor(){
+	constructor() {
 		super();
 		this.stopped = true;
-		window.showQRScanner = (args, callback)=>{
+		window.showQRScanner = (args, callback) => {
 			this.open(args, callback)
 		}
 	}
-	renderHeading({estimating}){
+	renderHeading({ estimating }) {
 		return html`${this.renderBackBtn()} ${this.heading}`
 	}
-	renderBody(){
+	renderBody() {
 		let value = this.value || '';
 		let debug = this.debug;
-		let {inputLabel='Scan result'} = this;
+		let { inputLabel = 'Scan result' } = this;
 		return html`
-		<flow-qrcode-scanner qrcode="${this.value||''}" _hidecode ?debug=${debug}
+		<flow-qrcode-scanner qrcode="${this.value || ''}" _hidecode ?debug=${debug}
 			@changed="${this.onQRChange}"></flow-qrcode-scanner>
 		<!--flow-input class="full-width_" clear-btn value="${value}"
 			label="${inputLabel}" readonly @changed=${this.onInputChange}>
@@ -49,61 +49,61 @@ class KaspaQRScannerDialog extends KaspaDialog{
 		</div>
 		`;
 	}
-	stopQRScanning(){
+	stopQRScanning() {
 		let scanner = this.qS("flow-qrcode-scanner");
 		scanner.stop();
 		this.stopped = true;
 	}
-	startScanning(){
+	startScanning() {
 		let scanner = this.qS("flow-qrcode-scanner");
 		scanner.start();
 		this.stopped = false;
 	}
-	sendBack(e){
+	sendBack(e) {
 		this.sendValueBack();
 	}
-	sendValueBack(){
-		this.callback({value:this.value, dialog:this})
+	sendValueBack() {
+		this.callback({ value: this.value, dialog: this })
 	}
-	onInputChange(e){
+	onInputChange(e) {
 		let value = e.detail.value;
 		this.setValue(value);
 	}
-	onQRChange(e){
+	onQRChange(e) {
 		let value = e.detail.code;
 		this.setValue(value);
 	}
-	async setValue(value){
+	async setValue(value) {
 		let isValid = !!value;
 		this.value = value;
 		this.setError("")
-		if(value && this.isAddressQuery){
+		if (value && this.isAddressQuery) {
 			isValid = await this.wallet.isValidAddress(value)
-			if(!isValid)
+			if (!isValid)
 				this.setError(i18n.t("Invalid Address"))
 		}
 		this.isValid = isValid;
-		if(isValid)
+		if (isValid)
 			this.sendValueBack();
 	}
-	open(args, callback){
+	open(args, callback) {
 		this.callback = callback;
 		this.args = args;
-		this.value = args.value||'';
-		this.heading = args.title||args.heading||i18n.t('Scan QR code');
-		this.inputLabel = args.inputLabel||i18n.t('Scan result');
+		this.value = args.value || '';
+		this.heading = args.title || args.heading || i18n.t('Scan QR code');
+		this.inputLabel = args.inputLabel || i18n.t('Scan result');
 		this.isAddressQuery = !!args.isAddressQuery;
 		this.wallet = args.wallet
 		this.show();
 		this.startScanning();
 	}
-	_hide(skipHistory=false){
+	_hide(skipHistory = false) {
 		this.stopQRScanning();
 		super._hide(skipHistory);
 	}
-    cancel(){
-    	this.hide();
-    }
+	cancel() {
+		this.hide();
+	}
 }
 
 KaspaQRScannerDialog.define("kaspa-qrscanner-dialog");
