@@ -283,8 +283,8 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 		let PWAVersion = window.PWA?.version || '';
 
 		let donationAddresses = [
-			["Devfund donations:", "kaspa:precqv0krj3r6uyyfa36ga7s0u9jct0v4wg8ctsfde2gkrsgwgw8jgxfzfc98"],
-			["Mining address:", "kaspa:pzhh76qc82wzduvsrd9xh4zde9qhp0xc8rl7qu2mvl2e42uvdqt75zrcgpm00"],
+			["Devfund donations:", "hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"],
+			["Mining address:", "hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"],
 			//["KDX/WebWallet donations:", "kaspa:qrncjga8hej9q59q85ge5js6m4y97el6ahp3m87hyzqdtaq6pf0v7xek7x900"],
 		]
 
@@ -367,7 +367,7 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 								<span is="i18n-span">DONATIONS</span>
 							</div>
 							<p is="i18n-p">
-								if you wish to further the development of the kaspa ecosystem, we accept kaspa donations at the following addresses:
+								if you wish to further the development of the hoosat ecosystem, we accept kaspa donations at the following addresses:
 							</p>
 							${donationAddresses.map((t) => {
 				let [title, address] = t;
