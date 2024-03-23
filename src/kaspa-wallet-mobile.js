@@ -356,9 +356,9 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 						<flow-btn class="center-btn primary v-margin"
 							@click="${this.showRecoverWallet}" i18n>Recover From Seed</flow-btn>
 						<flow-btn class="center-btn primary v-margin"
-							@click="${this.exportWalletFile}" i18n>Export Wallet Seed File (KPK)</flow-btn>
+							@click="${this.exportWalletFile}" i18n>Export Wallet Seed File</flow-btn>
 						<flow-btn class="center-btn primary v-margin"
-							@click="${this.importWalletFile}" i18n>Import Wallet Seed File (KPK)</flow-btn>
+							@click="${this.importWalletFile}" i18n>Import Wallet Seed File</flow-btn>
 						<input class="hidden-file-input" type="file" />
 						
 						<flow-expandable class="donation-info" no-info no-icon icon="-">
