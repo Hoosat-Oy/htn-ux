@@ -367,7 +367,7 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 								<span is="i18n-span">DONATIONS</span>
 							</div>
 							<p is="i18n-p">
-								if you wish to further the development of the hoosat ecosystem, we accept kaspa donations at the following addresses:
+								if you wish to further the development of the hoosat ecosystem, we accept HTN donations at the following addresses:
 							</p>
 							${donationAddresses.map((t) => {
 				let [title, address] = t;
