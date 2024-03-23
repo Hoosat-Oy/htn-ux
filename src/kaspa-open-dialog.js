@@ -79,7 +79,7 @@ class KaspaOpenDialog extends KaspaDialog {
 	}
 	renderInitUI() {
 		return html`
-			<div class="sub-heading text-center" is="i18n-div">Welcome to Kaspa Wallet</div>
+			<div class="sub-heading text-center" is="i18n-div">Welcome to Hoosat Wallet</div>
 		`
 	}
 	renderRecoverUI() {
