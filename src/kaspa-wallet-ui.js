@@ -440,6 +440,7 @@ export class KaspaWalletUI extends BaseElement {
 		}
 
 		items.map((tx, i) => {
+			console.log(tx);
 			if (tx.isMoved) {
 				return
 			}
@@ -475,13 +476,7 @@ export class KaspaWalletUI extends BaseElement {
 						row.push(tx.myAddress ? 'YES' : '')
 						break;
 					case 'date':
-						if (tx.version == 1) {
-							row.push('N/A');
-						} else if (tx.version == 2) {
-							row.push(tx.date)
-						} else {
-							row.push('')
-						}
+						row.push(tx.date ? tx.date : 'N/A');
 						break;
 
 				}

@@ -171,7 +171,7 @@ export class KaspaDialog extends BaseElement {
 			return
 		let name = this.tagName || this.name || this.constructor.name;
 		name = name.replace(/\-/g, "");
-		let key = name.toLowerCase().replace(/(kaspa|dialog|mobile)/g, '')
+		let key = name.toLowerCase().replace(/(hoosat|dialog|mobile)/g, '')
 		let state = { type: name, uid, key };
 		history.pushState(state, name, "/" + key + "/" + uid);
 		historyStack.push(state)
