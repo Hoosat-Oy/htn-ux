@@ -283,9 +283,9 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 		let PWAVersion = window.PWA?.version || '';
 
 		let donationAddresses = [
-			["Devfund donations:", "hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"],
+			["Development address:", "hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"],
 			["Mining address:", "hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"],
-			//["KDX/WebWallet donations:", "kaspa:qrncjga8hej9q59q85ge5js6m4y97el6ahp3m87hyzqdtaq6pf0v7xek7x900"],
+			["Funding address:", "hoosat:qry9xevl44e8pyvkkkp5wnvavyg59rge6j0yhgg70wzqepuw6t28jqg34hgh5"],
 		]
 
 		return html`
@@ -690,7 +690,7 @@ export class KaspaWalletMobile extends KaspaWalletUI {
 		})
 	}
 	showReceiveDialog() {
-		let address = this.receiveAddress || 'hoosat:abc'
+		let address = this.receiveAddress || 'hoosattest:abc'
 		this.receiveDialog.open({ wallet: this, address }, (args) => {
 			//
 		})

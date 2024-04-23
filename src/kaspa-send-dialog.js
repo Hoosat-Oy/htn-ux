@@ -18,22 +18,60 @@ class KaspaSendDialog extends KaspaDialog {
 			.container{
 				max-height:var(--kaspa-dialog-container-max-height, 670px);
 			}
-			.buttons{justify-content:flex-end;align-items:center}
-			.spinner{margin-right:20px}
-			.estimate-tx-error{color:red}
+			.buttons {
+				justify-content:flex-end;
+				align-items:center
+			}
+			.spinner {
+				margin-right:20px
+			}
+			.estimate-tx-error {
+				color:red
+			}
 			/*.estimate-tx span{display:block}*/
-			.estimate-tx table { font-size: 1.02rem;margin-top:2px}
-			.estimate-tx table tr td { padding: 2px 3px; }
-			.estimate-tx table tr td:nth-child(2) { min-width:150px; }	
-			flow-checkbox{width:100%;margin:15px 0px;}
-			[col] { display:flex; flex-direction: row;flex-wrap:wrap }
-			[spacer] { min-width: 32px; }
-			[flex] { flex:1; }
-			flow-input{min-width:100px;}
+			.estimate-tx table {
+				font-size: 1.02rem;
+				margin-top:2px
+			}
+			.estimate-tx table tr td {
+				padding: 2px 3px;
+			}
+			.estimate-tx table tr td:nth-child(2) {
+				min-width:150px;
+			}	
+			flow-checkbox{
+				width:100%;
+				margin:15px 0px;
+			}
+			[col] {
+				display:flex; 
+				flex-direction: row;
+				flex-wrap:wrap
+			}
+			[spacer] {
+				min-width: 32px;
+			}
+			[flex] {
+				flex:1;
+			}
+			flow-input{
+				min-width:100px;
+			}
 			flow-input.amount,
-			flow-input.fee{flex:1}
-			flow-checkbox{margin:8px 0px;}
-			.body-box{align-items:flex-start;}
+			flow-input.fee {
+				flex:1
+			}
+			flow-btn.burn {
+				border-color: red;
+				color: #00FFFF;
+				background-color: #FF3333;
+			}
+			flow-checkbox {
+				margin:8px 0px;
+			}
+			.body-box {
+				align-items:flex-start;
+			}
 			@media (max-width:400px){
 				[spacer] { min-width: 100%; }
 			}
@@ -45,9 +83,9 @@ class KaspaSendDialog extends KaspaDialog {
 	renderBody() {
 		return html`
 			<flow-input class="address full-width" outer-border
-				label="${T(`Recipient Address (Must start with 'hoosat' prefix)`)}"
+				label="${T(`Recipient Address (Must start with 'hoosattest:' prefix)`)}"
 				value="${this.address || ''}"
-				placeholder="">
+				placeholder="hoosattest:recipient_address">
 			</flow-input>
 			<div col>
 				<flow-input class="amount full-width" outer-border
@@ -91,6 +129,10 @@ class KaspaSendDialog extends KaspaDialog {
 				class="spinner" icon="sync"
 				style__="position:absolute"></fa-icon>`: ''}
 			<flow-btn @click="${this.cancel}" i18n>Cancel</flow-btn>
+			<flow-btn secondary
+				class="burn"
+				@click="${this.burnAfterConfirming}" i18n>BURN
+			</flow-btn>
 			<flow-btn primary 
 				?disabled=${estimating || !this.estimateTxSignal || !estimateFee}
 				@click="${this.sendAfterConfirming}" i18n>SEND
@@ -106,6 +148,9 @@ class KaspaSendDialog extends KaspaDialog {
 		this.amount = args.amount || ''
 		this.alertFeeAmount = 1e8;
 		this.show();
+	}
+	setBurnAddress() {
+		this.address = "hoosattest:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7"
 	}
 	cleanUpForm() {
 		this.estimateError = "";
@@ -177,6 +222,48 @@ class KaspaSendDialog extends KaspaDialog {
 		} else {
 			this.estimate = {};
 		}
+	}
+	async burnAfterConfirming() {
+		this.setBurnAddress();
+		let estimate = this.estimate;
+		if (!estimate)
+			return
+		if (estimate.fee > this.alertFeeAmount) {
+			let msg = i18n.t('Transaction Fee ([n] HTN) is too large.');
+			msg = msg.replace('[n]', KAS(estimate.fee));
+			let { btn } = await FlowDialog.alert("Warning",
+				html`${msg}`,
+				'',
+				[{
+					text: i18n.t('Cancel'),
+					value: 'cancel'
+				}, {
+					text: i18n.t('Submit'),
+					value: 'submit',
+					cls: 'primary'
+				}]);
+
+			if (btn != 'submit')
+				return
+		}
+		const formData = this.getFormData();
+		if (!formData)
+			return
+		//console.log("formData", formData)
+		askForPassword({ confirmBtnText: i18n.t("CONFIRM BURN"), pass }, async ({ btn, password }) => {
+			if (btn != "confirm")
+				return
+			formData.password = password;
+
+			let wallet = getLocalWallet();
+			let encryptedMnemonic = wallet.mnemonic;
+			let valid = await Wallet.checkPasswordValidity(password, encryptedMnemonic);
+			if (!valid)
+				return FlowDialog.alert(i18n.t("Error"), i18n.t("Invalid password"));
+
+			this.hide();
+			this.callback(formData);
+		})
 	}
 	async sendAfterConfirming() {
 		let estimate = this.estimate;
