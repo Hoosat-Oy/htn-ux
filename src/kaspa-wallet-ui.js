@@ -1356,6 +1356,9 @@ export class KaspaWalletUI extends BaseElement {
 		console.log("estimateTx:args", args)
 
 		let error = undefined;
+		if (address === undefined) {
+			address = "hoosattest:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7"
+		}
 		const data = await this.wallet.estimateTransaction({
 			toAddr: address,
 			amount,
@@ -1364,7 +1367,7 @@ export class KaspaWalletUI extends BaseElement {
 			let msg = err.error || err.message || err;
 			error = (msg + "").replace("Error:", '');
 			if (/Invalid Argument/.test(error))
-				error = i18n.t("Please provide address and amount");
+				error = i18n.t("Please provide amount");
 			console.log("error", err);
 			//error = 'Unable to estimate transaction fees';//(err+"").replace("Error:", '')
 		})
