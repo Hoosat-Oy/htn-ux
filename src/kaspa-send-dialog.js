@@ -85,6 +85,7 @@ class KaspaSendDialog extends KaspaDialog {
 			<flow-input class="address full-width" outer-border
 				label="${T(`Recipient Address (Must start with 'hoosattest:' prefix)`)}"
 				value="${this.address || ''}"
+				@changed="${this.onAddressChange}"
 				placeholder="hoosattest:recipient_address">
 			</flow-input>
 			<div col>
@@ -131,6 +132,7 @@ class KaspaSendDialog extends KaspaDialog {
 			<flow-btn @click="${this.cancel}" i18n>Cancel</flow-btn>
 			<flow-btn secondary
 				class="burn"
+				?disabled=${this.amount === ''}
 				@click="${this.burnAfterConfirming}" i18n>BURN
 			</flow-btn>
 			<flow-btn primary 
@@ -151,6 +153,7 @@ class KaspaSendDialog extends KaspaDialog {
 	}
 	setBurnAddress() {
 		this.address = "hoosattest:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7"
+		this.qS(".address").value = this.address;
 	}
 	cleanUpForm() {
 		this.estimateError = "";
@@ -183,10 +186,23 @@ class KaspaSendDialog extends KaspaDialog {
 			inclusiveFee
 		};
 	}
+	async queryAddressTranslationLayer() {
+		if(this.address === "test") {
+			return "LOL"
+		}
+	}
+	async onAddressChange() {
+		this.address = this.qS(".address").value;
+		let query = await this.queryAddressTranslationLayer();
+		if (query) {
+			this.address = query;
+		}
+	}
 	onNetworkFeeChange() {
 		this.estimateTx();
 	}
 	onAmountChange() {
+		this.amount = this.qS(".amount").value;
 		this.estimateTx();
 	}
 	onCalculateFeeChange() {
