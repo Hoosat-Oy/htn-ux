@@ -1356,7 +1356,7 @@ export class KaspaWalletUI extends BaseElement {
 		console.log("estimateTx:args", args)
 
 		let error = undefined;
-		if (address === undefined) {
+		if (!address) {
 			address = "hoosattest:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7"
 		}
 		const data = await this.wallet.estimateTransaction({
