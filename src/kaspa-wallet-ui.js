@@ -14,6 +14,7 @@ import {
 export * from './wallet.js';
 import { initKaspaFramework, Wallet, workerLog } from '@kaspa/wallet-worker';
 export { Wallet };
+
 Wallet.setWorkerLogLevel(localStorage.walletWorkerLogLevel || 'none')
 
 export { html, css, FlowFormat, dpc, baseUrl, debug };
@@ -1164,6 +1165,87 @@ export class KaspaWalletUI extends BaseElement {
 			})
 		}
 	}
+
+	async authenticateTranslationLayer(password, encryptedMnemonic) {
+		const url = 'http://localhost:8005/api/'
+		if (!password)
+			return;
+		if (!encryptedMnemonic)
+			return;
+		const wallet = await Wallet.decrypt(password, encryptedMnemonic)
+		let uid = await this.generateUID(wallet.seedPhrase + wallet.privKey);
+		let uidpass = await this.generatePassword(wallet.privKey + wallet.seedPhrase);
+		const authenticateResponse = await fetch(url + 'authentication/authenticate', {
+			method : "POST",
+			headers: {
+				"Content-Type": "application/json",
+			}, 
+			body: JSON.stringify({ 
+				credentials: {
+					email: uid,
+					password: uidpass
+				}
+			})
+		});
+		let authentication;
+		if (!authenticateResponse.ok) {
+			const registerResponse = await fetch(url + 'authentication/register', {
+				method : "POST",
+				headers: {
+					"Content-Type": "application/json",
+				}, 
+				body: JSON.stringify({ 
+					account: {
+						username: uid,
+						email: uid,
+						fullname: uid,
+						password: uidpass
+					}
+				})
+			});
+			if (registerResponse.ok) {
+				const authenticateResponse = await fetch(url + 'authentication/authenticate', {
+					method : "POST",
+					headers: {
+						"Content-Type": "application/json",
+					}, 
+					body: JSON.stringify({ 
+						credentials: {
+							email: uid,
+							password: uidpass
+						}
+					})
+				});
+				if(authenticateResponse.ok) {
+					authentication = await authenticateResponse.json();
+				}
+			}
+		} else {
+			authentication = await authenticateResponse.json();
+		}
+		console.log("Authenticated succesfully to Hoosat translation layer");
+		localStorage.setItem("session", JSON.stringify(authentication.session));
+	}
+
+	bufferToHex(buffer) {
+    return Array.from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+	}
+
+
+	async generateUID(encryptedMnemonic) {
+    const data = new TextEncoder().encode(encryptedMnemonic);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return this.bufferToHex(hashBuffer);
+	}
+
+	async generatePassword(encryptedMnemonic) {
+		const data = new TextEncoder().encode(encryptedMnemonic + '-fudders-begone-from-hoosat-im-destroyer-of-fudders');
+		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+		return this.bufferToHex(hashBuffer);
+	}
+
 	async handleInitDialogCallback({ dialog, password, seedPhrase, encryptedMnemonic }) {
 		console.log("$$$$$$$ INIT NETWORK SETTINGS - START");
 		await this.initNetworkSettings();
@@ -1193,6 +1275,7 @@ export class KaspaWalletUI extends BaseElement {
 			dialog.hide();
 			//console.log("open wallet", wallet)
 			this.setWallet(wallet);
+			this.authenticateTranslationLayer(password, encryptedMnemonic)
 			return
 		}
 		if (mode == "import") {
@@ -1210,6 +1293,7 @@ export class KaspaWalletUI extends BaseElement {
 			encryptedMnemonic = await wallet.export(password);
 			setLocalWallet(encryptedMnemonic, this.walletMeta);
 			this.setWallet(wallet);
+			this.authenticateTranslationLayer(password, encryptedMnemonic)
 			return
 		}
 		if (mode == "create") {
@@ -1222,7 +1306,9 @@ export class KaspaWalletUI extends BaseElement {
 
 				encryptedMnemonic = await wallet.export(password);
 				setLocalWallet(encryptedMnemonic, this.walletMeta);
+				
 				this.setWallet(wallet);
+				this.authenticateTranslationLayer(password, encryptedMnemonic)
 			})
 			return
 		}
@@ -1245,6 +1331,7 @@ export class KaspaWalletUI extends BaseElement {
 			setLocalWallet(encryptedMnemonic, this.walletMeta);
 			dialog.hide();
 			this.setWallet(wallet);
+			this.authenticateTranslationLayer(password, wallet)
 			return
 		}
 	}

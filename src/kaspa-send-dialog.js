@@ -155,6 +155,10 @@ class KaspaSendDialog extends KaspaDialog {
 		this.address = "hoosattest:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7"
 		this.qS(".address").value = this.address;
 	}
+	translateAddress() {
+		let addressToTranslate = this.qS(".address").value;
+		
+	}
 	cleanUpForm() {
 		this.estimateError = "";
 		this.estimate = {};
