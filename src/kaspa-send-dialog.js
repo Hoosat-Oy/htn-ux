@@ -83,10 +83,10 @@ class KaspaSendDialog extends KaspaDialog {
 	renderBody() {
 		return html`
 			<flow-input class="address full-width" outer-border
-				label="${T(`Recipient Address (Must start with 'hoosattest:' prefix)`)}"
+				label="${T(`Recipient Address (Must start with 'hoosat' prefix)`)}"
 				value="${this.address || ''}"
 				@changed="${this.onAddressChange}"
-				placeholder="hoosattest:recipient_address">
+				placeholder="hoosat:recipient_address">
 			</flow-input>
 			<div col>
 				<flow-input class="amount full-width" outer-border
