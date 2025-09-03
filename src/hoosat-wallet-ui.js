@@ -1343,7 +1343,7 @@ export class HoosatWalletUI extends BaseElement {
       //console.log("recover:Wallet:seedPhrase, password", seedPhrase, password)
       let wallet;
       try {
-        wallet = Wallet.fromMnemonic(seedPhrase, { network, rpc });
+        wallet = Wallet.fromMnemonic(seedPhrase, { network: network.replace("hoosat-", ""), rpc });
       } catch (error) {
         console.log("recover:Wallet.fromMnemonic error", error);
         dialog.setError(i18n.t("Invalid seed") + ` (${error.message})`);
