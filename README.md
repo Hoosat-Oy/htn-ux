@@ -1,1 +1,1 @@
-# kaspa-ux
+# hoosat-ux

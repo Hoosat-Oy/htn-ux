@@ -2,4 +2,4 @@ node_modules
 package-lock.json
 *.local.conf
 bin/*
-src/kaspa-wallet-desktop_v0.js
+src/hoosat-wallet-desktop_v0.js

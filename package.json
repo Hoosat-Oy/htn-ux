@@ -1,18 +1,17 @@
 {
-  "name": "@kaspa/ux",
+  "name": "@hoosat/ux",
   "version": "1.0.30",
   "description": "Hoosat Wallet User Interface Framework",
-  "main": "kaspa-ux.js",
-  "private": true,
+  "main": "hoosat-ux.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aspectron/kaspa-ux"
+    "url": "git+https://github.com/aspectron/hoosat-ux"
   },
   "keywords": [],
   "dependencies": {},
   "files": [
-    "kaspa-ux.js",
-    "kaspa-ux.css",
+    "hoosat-ux.js",
+    "hoosat-ux.css",
     "src",
     "README.md",
     "LICENSE",
